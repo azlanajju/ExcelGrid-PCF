@@ -1,0 +1,79 @@
+export type Cell = string | number;
+
+export interface GridConfig {
+  [columnIndex: number]: string[];
+}
+
+export interface FormulaConfig {
+  [columnIndex: number]: string;
+}
+
+export interface UploadConfig {
+  [columnIndex: number]: string;
+}
+
+export interface ConversionConfig {
+  [key: number]: [number, number];
+}
+
+export interface ExcelGridProps {
+  onDataChange: (data: Cell[][], frozenColumns?: string) => void;
+  onColumnOrderChange: (columnOrder: string) => void;
+  onFileUpdload: (row: string, col: string) => void;
+  onCellDropDown: (row: string, col: string, isReset?: boolean) => void;
+  onFileView: (row: string, col: string, currVal: string) => void;
+  inputGrid?: Cell[][] | string;
+  gridConfig?: number[];
+  gridConfigVals?: string[];
+  formulaConfig?: FormulaConfig;
+  frozenColumns?: number[];
+  fileSetCells?: number[];
+  tableEditable: boolean;
+  headerEditable?: boolean;
+  showAddRowButton?: boolean;
+  showAddColumnButton?: boolean;
+  sumTotalColumns: number[];
+  readOnlyColumns?: number[];
+  frozenColumnsString: string;
+  conversionCols: ConversionConfig;
+  columnOrder?: string;
+  headerStyle?: {
+    backgroundColor?: string;
+    headerBackgroundColorFrozen?: string;
+    borderColor?: string;
+    fontFamily?: string;
+    fontSize?: string;
+    fontStyle?: string;
+    fontWeight?: string;
+    color?: string;
+  };
+  bodyStyle?: {
+    fontFamily?: string;
+    fontSize?: string;
+    fontStyle?: string;
+    fontWeight?: string;
+    color?: string;
+    backgroundColor?: string;
+    borderColor?: string;
+  };
+}
+
+export interface DropdownState {
+  row: number;
+  col: number;
+  options: string[];
+  filteredOptions: string[];
+  inputValue: string;
+}
+
+export interface Selection {
+  start: [number, number];
+  end: [number, number];
+}
+
+export interface ContextMenu {
+  x: number;
+  y: number;
+  row: number;
+  col: number;
+}

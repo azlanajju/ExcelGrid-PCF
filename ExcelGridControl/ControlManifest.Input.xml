@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest>
+  <control namespace="com.novigo.com" constructor="DPSGridV1" version="0.0.3" display-name-key="DPSGridV1Control" description-key="DPSGridV1Control description" control-type="standard">
+    <external-service-usage enabled="false" />
+
+    <!-- Existing properties -->
+    <property name="gridInput" display-name-key="Grid-Input" description-key="Input String for table in matrix format" of-type="SingleLine.Text" usage="bound" required="true" />
+
+    <property name="val1" display-name-key="val1" description-key="Input String for table in matrix format" of-type="Object" usage="bound" required="true" />
+
+    <property name="columnDefinition" display-name-key="Column-Dropdown-Definition" description-key="Columns with drop downs ; saperated" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="columnDropdownSelected" display-name-key="Column-Dropdown-Selected" description-key="Currently selcted column" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="columnDefinitionValue" display-name-key="Column-Dropdown-Value" description-key="Columns with drop down vlues ; saperated" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="formulaDefiniation" display-name-key="Formula-Definition" description-key="Json definiation for defining formulas" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="tableEditable" display-name-key="Editable-Table" description-key="Boolean to set table is editable or not" of-type="TwoOptions" usage="bound" required="false" />
+    <property name="headerEditable" display-name-key="Header-Editable" description-key="Allow editing of header cells" of-type="TwoOptions" usage="input" required="false" />
+    <property name="showAddRowButton" display-name-key="Show-Add-Row-Button" description-key="Show Add Row button in toolbar and context menu" of-type="TwoOptions" usage="input" required="false" />
+    <property name="showAddColumnButton" display-name-key="Show-Add-Column-Button" description-key="Show Add Column button in toolbar and context menu" of-type="TwoOptions" usage="input" required="false" />
+    <property name="sumTotalColumns" display-name-key="Totaled-Columns" description-key="Columns with total sumed semicolon sapearated" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="readOnlyColumns" display-name-key="Read-Only-Columns" description-key="Columns that are read-only (view-only), semicolon separated column indices" of-type="SingleLine.Text" usage="bound" required="false" />
+  
+
+    <!-- File properties -->
+    <property name="fileSetCells" display-name-key="File_Set_Cells" description-key="Cells where files will be managed, semicolon saperated indexes" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="uploadingCell" display-name-key="Uploading_Cell" description-key="Cell where file being uploaded" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="viewingCell" display-name-key="Veiwing_Cell" description-key="Cell where file being viewed" of-type="SingleLine.Text" usage="bound" required="false" />
+
+    <!-- Existing grid colors -->
+    <property name="frozenColumns" display-name-key="Frozen_Columns" description-key="All frozen columns ; saperated" of-type="SingleLine.Text" usage="bound" required="false" />
+
+    <!-- Column Reorder Property -->
+    <property name="columnOrder" display-name-key="Column_Order" description-key="Column order as JSON array (e.g., [&quot;Header1&quot;,&quot;Header2&quot;])" of-type="SingleLine.Text" usage="bound" required="false" />
+
+    <!-- 🔹 Header Styling -->
+    <property name="headerFontFamily" display-name-key="Header_Font_Family" description-key="Font family for header" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="headerFontSize" display-name-key="Header_Font_Size" description-key="Font size for header (px, em, etc.)" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="headerFontStyle" display-name-key="Header_Font_Style" description-key="Font style for header (normal, italic)" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="headerFontWeight" display-name-key="Header_Font_Weight" description-key="Font weight for header (normal, bold, 100-900)" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="headerTextColor" display-name-key="Header_Text_Color" description-key="Text color of header" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="headerBackgroundColor" display-name-key="Header_Background_Color" description-key="Background color of header cells" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="headerBackgroundColorFrozen" display-name-key="Header_Background_Color" description-key="Background color of header cells when frozen" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="headerBorderColor" display-name-key="Header_Border_Color" description-key="Border color of header cells" of-type="SingleLine.Text" usage="input" required="false" />
+
+    <!-- 🔹 Body Styling -->
+    <property name="bodyFontFamily" display-name-key="Body_Font_Family" description-key="Font family for body cells" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="bodyFontSize" display-name-key="Body_Font_Size" description-key="Font size for body cells (px, em, etc.)" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="bodyFontStyle" display-name-key="Body_Font_Style" description-key="Font style for body cells (normal, italic)" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="bodyFontWeight" display-name-key="Body_Font_Weight" description-key="Font weight for body cells (normal, bold, 100-900)" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="bodyTextColor" display-name-key="Body_Text_Color" description-key="Text color of body cells" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="bodyBackgroundColor" display-name-key="Body_Background_Color" description-key="Background color of body cells" of-type="SingleLine.Text" usage="input" required="false" />
+    <property name="bodyBorderColor" display-name-key="Body_Border_Color" description-key="Border color of body cells" of-type="SingleLine.Text" usage="input" required="false" />
+
+
+
+    <resources>
+      <code path="index.ts" order="1" />
+    </resources>
+  </control>
+  
+</manifest>
