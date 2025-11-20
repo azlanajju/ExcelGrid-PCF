@@ -26,6 +26,7 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
 
   const { selection, focusedCell, setSelection, setFocusedCell, startSelection, extendSelection, endSelection, getSelectedRange } = useSelection();
 
+
   const { columnWidths, rowHeights, startResize, colRefs, colWidths, setColWidths, tableRef } = useResize(data);
 
   const { getCellAlignment, setTextAlign } = useCellAlignment();
@@ -39,6 +40,11 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
   useEffect(() => {
     console.log("Version:", 1.7);
   }, []);
+
+  useEffect(() => {
+    console.log("cellHighlight", props.cellHighlight, data);
+  }, [])
+
 
   const cellRefs = useRef<(HTMLTableCellElement | null)[][]>([]);
   const inputRefs = useRef<(HTMLTableCellElement | null)[][]>([]);
@@ -249,10 +255,10 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
       setActiveDropdown((prev) =>
         prev
           ? {
-              ...prev,
-              options: newOptions,
-              filteredOptions: newOptions,
-            }
+            ...prev,
+            options: newOptions,
+            filteredOptions: newOptions,
+          }
           : null
       );
     }
@@ -266,9 +272,9 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
           <div className="help-icon-container">
             <button className="help-icon-btn" title="Keyboard Shortcuts">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                <line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M9.09 9C9.3251 8.33167 9.78915 7.76811 10.4 7.40913C11.0108 7.05016 11.7289 6.91894 12.4272 7.03871C13.1255 7.15849 13.7588 7.52152 14.2151 8.06353C14.6713 8.60553 14.9211 9.29152 14.92 10C14.92 12 11.92 13 11.92 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <line x1="12" y1="17" x2="12.01" y2="17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
             <div className="help-tooltip">
@@ -280,7 +286,31 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
             </div>
           </div>
         </div>
-        <Toolbar tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton} addRow={() => setData((prev) => [...prev, new Array(prev[0].length).fill("")])} addCol={() => setData((prev) => prev.map((row) => [...row, ""]))} downloadExcel={handleDownloadExcel} downloadExcelAll={handleDownloadExcelAll} onDataLoaded={(matrix) => {
+        <Toolbar tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton} 
+        // addRow={() => setData((prev) => [...prev, new Array(prev[0].length).fill("")])} 
+        addRow={() =>
+  setData((prev) => {
+    // If no rows or only header, allow add
+    if (prev.length <= 1) {
+      return [...prev, new Array(prev[0].length).fill("")];
+    }
+
+    const lastRow = prev[prev.length - 1];
+
+    // Check if ANY column in last row is empty ("", null, undefined)
+    const isAnyEmpty = lastRow.some((cell) => cell === "" || cell == null);
+
+    if (isAnyEmpty) {
+      alert("Please fill all cells in the last row before adding a new row.");
+      return prev; // Block add row
+    }
+
+    // Add row only if last row is fully filled
+    return [...prev, new Array(prev[0].length).fill("")];
+  })
+}
+
+        addCol={() => setData((prev) => prev.map((row) => [...row, ""]))} downloadExcel={handleDownloadExcel} downloadExcelAll={handleDownloadExcelAll} onDataLoaded={(matrix) => {
           // Keep existing header and only update data rows
           setData((prev) => {
             if (prev.length === 0) return matrix;
@@ -300,7 +330,16 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
       </div>
 
       <div className="excel-scroll-container" onScroll={handleScroll}>
-        <GridTable data={dataWithTotals} selection={selection} focusedCell={focusedCell} frozenCols={localFrozenColumns} fileSetCells={localFileSetCells} configData={configData} tableEditable={props.tableEditable} headerStyle={props.headerStyle} bodyStyle={props.bodyStyle} onCellClick={handleCellClick} onCellChange={handleChange} onCellFocus={handleInputFocus} rowIds={rowIds} onContextMenu={handleContextMenu} onMouseDown={startSelection} onMouseUp={endSelection} onMouseOver={extendSelection} startResize={startResize} hasDropdownOptions={hasDropdownOptions} hasFormula={(col) => hasFormula(col, props.formulaConfig)} getFormula={(col) => getFormula(col, props.formulaConfig)} hasUpload={hasUpload} validateAndCorrectValue={validateAndCorrectValue} isCellEditable={isCellEditable} colWidths={colWidths} getFrozenLeft={getFrozenLeft} tableRef={tableRef} cellRefs={cellRefs} colRefs={colRefs} conversionConfig={props.conversionCols} onFileUpdload={props.onFileUpdload} onFileView={props.onFileView} onCellDropDown={props.onCellDropDown} getCellAlignment={getCellAlignment} {...props} />
+        <GridTable data={dataWithTotals} selection={selection} focusedCell={focusedCell} frozenCols={localFrozenColumns}
+          fileSetCells={localFileSetCells} configData={configData} tableEditable={props.tableEditable}
+          headerStyle={props.headerStyle} bodyStyle={props.bodyStyle} onCellClick={handleCellClick}
+          onCellChange={handleChange} onCellFocus={handleInputFocus} rowIds={rowIds} onContextMenu={handleContextMenu}
+          onMouseDown={startSelection} onMouseUp={endSelection} onMouseOver={extendSelection} startResize={startResize}
+          hasDropdownOptions={hasDropdownOptions} hasFormula={(col) => hasFormula(col, props.formulaConfig)}
+          getFormula={(col) => getFormula(col, props.formulaConfig)} hasUpload={hasUpload} validateAndCorrectValue={validateAndCorrectValue}
+          isCellEditable={isCellEditable} colWidths={colWidths} getFrozenLeft={getFrozenLeft} tableRef={tableRef}
+          cellRefs={cellRefs} colRefs={colRefs} conversionConfig={props.conversionCols} onFileUpdload={props.onFileUpdload}
+          onFileView={props.onFileView} onCellDropDown={props.onCellDropDown} getCellAlignment={getCellAlignment} cellHighlight={props.cellHighlight} {...props} />
 
         {activeDropdown && <DropdownMenu activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection} />}
       </div>
@@ -313,9 +352,31 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
           showAddColumnButton={props.showAddColumnButton}
           onAddRow={(rowIndex) =>
             setData((prev) => {
-              const newData = [...prev];
-              newData.splice(rowIndex + 1, 0, new Array(prev[0].length).fill(""));
-              return updateFormulas(newData, props.formulaConfig);
+
+    // If no rows or only header, allow add
+    if (prev.length <= 1) {
+      return [...prev, new Array(prev[0].length).fill("")];
+    }
+
+    const lastRow = prev[prev.length - 1];
+
+    // Check if ANY column in last row is empty ("", null, undefined)
+    const isAnyEmpty = lastRow.some((cell) => cell === "" || cell == null);
+
+    if (isAnyEmpty) {
+      alert("Please fill all cells in the last row before adding a new row.");
+      return prev; // Block add row
+    }
+
+    // Add row only if last row is fully filled
+    return [...prev, new Array(prev[0].length).fill("")];
+  
+
+
+
+              // const newData = [...prev];
+              // newData.splice(rowIndex + 1, 0, new Array(prev[0].length).fill(""));
+              // return updateFormulas(newData, props.formulaConfig);
             })
           }
           onAddCol={(colIndex) =>

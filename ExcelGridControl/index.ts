@@ -10,6 +10,7 @@ const constants = {
   sampleGrid: "",
   columnDefinition: "",
   columnDefinitionValue: "",
+  cellHighlight: "[]",
   formulaDefiniation: "",
   tableEditable: true,
   headerEditable: true,
@@ -44,7 +45,7 @@ const constants = {
   },
 };
 
-export class DPSGridV1 implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IOutputs> {
   private container: HTMLDivElement;
   private root: Root;
   private notifyOutputChanged: () => void;
@@ -57,6 +58,7 @@ export class DPSGridV1 implements ComponentFramework.StandardControl<IInputs, IO
   private sampleGrid = constants.sampleGrid;
   private columnDefinition = constants.columnDefinition;
   private columnDefinitionValue = constants.columnDefinitionValue;
+  private cellHighlight = constants.cellHighlight;
   private formulaDefiniation = constants.formulaDefiniation;
   private tableEditable = constants.tableEditable;
   private headerEditable = constants.headerEditable;
@@ -108,6 +110,7 @@ export class DPSGridV1 implements ComponentFramework.StandardControl<IInputs, IO
       columnDropdownSelected: this.columnDropdownSelected,
       sampleGrid: this.sampleGrid,
       columnDefinitionValue: this.columnDefinitionValue,
+      cellHighlight: this.cellHighlight,
       columnDefinition: this.columnDefinition,
       formulaDefiniation: this.formulaDefiniation,
       tableEditable: this.tableEditable,
@@ -146,6 +149,7 @@ export class DPSGridV1 implements ComponentFramework.StandardControl<IInputs, IO
       prev.columnDropdownSelected !== this.columnDropdownSelected ||
       prev.sampleGrid !== this.sampleGrid ||
       prev.columnDefinitionValue !== this.columnDefinitionValue ||
+      prev.cellHighlight !== this.cellHighlight ||
       prev.columnDefinition !== this.columnDefinition ||
       prev.formulaDefiniation !== this.formulaDefiniation ||
       prev.tableEditable !== this.tableEditable ||
@@ -214,6 +218,7 @@ export class DPSGridV1 implements ComponentFramework.StandardControl<IInputs, IO
 
     this.sampleGrid = this.getOrDefault(context.parameters.gridInput, constants.sampleGrid);
     this.columnDefinitionValue = this.getOrDefault(context.parameters.columnDefinitionValue, constants.columnDefinitionValue);
+    this.cellHighlight = this.getOrDefault(context.parameters.cellHighlight, constants.cellHighlight);
     this.columnDefinition = this.getOrDefault(context.parameters.columnDefinition, constants.columnDefinition);
     this.formulaDefiniation = this.getOrDefault(context.parameters.formulaDefiniation, constants.formulaDefiniation);
     this.tableEditable = this.getOrDefault(context.parameters.tableEditable, constants.tableEditable);
@@ -258,6 +263,7 @@ export class DPSGridV1 implements ComponentFramework.StandardControl<IInputs, IO
               .split(";")
               .filter((val) => val !== "")
           : [],
+        cellHighlight: this.cellHighlight ? JSON.parse(this.cellHighlight) : undefined,
         formulaConfig: this.formulaDefiniation ? JSON.parse(this.formulaDefiniation) : undefined,
         sumTotalColumns: this.sumTotalColumns
           .trim()

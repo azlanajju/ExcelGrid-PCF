@@ -36,9 +36,10 @@ interface GridCellProps {
   onFileView: (row: string, col: string, currVal: string) => void;
   headerVal: string;
   rowIds: Record<number, string>;
+  isHighlighted: boolean;
 }
 
-export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selected, focused, frozen, fileSetCell, hasDropdown, hasUpload, isFormula, isEditable, isTotalRow, headerStyle, bodyStyle, textAlign = "center", onMouseDown, onMouseOver, onMouseUp, onContextMenu, onClick, onChange, onFocus, onBlur, startResize, frozenLeft, colRefs, cellRefs, tableRef, onFileUpdload, onFileView, headerVal, onCellDropDown }) => {
+export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selected, focused, frozen, fileSetCell, hasDropdown, hasUpload, isFormula, isEditable, isTotalRow, headerStyle, bodyStyle, textAlign = "center", onMouseDown, onMouseOver, onMouseUp, onContextMenu, onClick, onChange, onFocus, onBlur, startResize, frozenLeft, colRefs, cellRefs, tableRef, onFileUpdload, onFileView, headerVal, onCellDropDown,isHighlighted }) => {
   const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null);
 
   // ---- Styles ----
@@ -82,6 +83,9 @@ export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selecte
     if (selected) inputRef.current?.focus();
   }, [selected]);
 
+  if(isHighlighted) console.log("Header true",headerVal,isHighlighted);
+  
+
   // ---- Renderer helpers ----
   const renderHeaderInput = () => (
     <input
@@ -94,6 +98,7 @@ export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selecte
       placeholder="Header"
       className={`excel-input header-input ${selected ? "selected" : ""} ${focused ? "focused" : ""} ${frozen ? "frozen" : ""}`}
       style={{
+          boxShadow: isHighlighted ? "inset 0 0 0px 3px #dd0000e5" : "",
         ...cellStyle,
         position: "relative",
         zIndex: selected || focused ? 10 : frozen ? 20 : 0,
@@ -116,6 +121,7 @@ export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selecte
       readOnly={!isEditable || isTotalRow}
       className={`excel-input ${selected ? "selected" : ""} ${frozen ? "frozen" : ""} ${hasDropdown ? "dropdown-input" : ""} ${isFormula ? "formula-input" : ""}`}
       style={{
+          boxShadow: isHighlighted ? "inset 0 0 0px 3px #dd0000e5" : "",
         ...cellStyle,
         width: "100%",
         borderTop: selected || focused ? "1px solid #e1e7ff" : "0px solid #e2e8f0",

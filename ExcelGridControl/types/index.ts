@@ -25,6 +25,7 @@ export interface ExcelGridProps {
   inputGrid?: Cell[][] | string;
   gridConfig?: number[];
   gridConfigVals?: string[];
+  cellHighlight?: string[];
   formulaConfig?: FormulaConfig;
   frozenColumns?: number[];
   fileSetCells?: number[];
