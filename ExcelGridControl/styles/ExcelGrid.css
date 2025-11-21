@@ -900,3 +900,27 @@
   text-align: center;
   border: 1px solid #e2e8f0;
 }
+
+
+.toast-popup {
+  position: fixed;
+  top: 20px;
+  left: calc(50% - 14em);
+  background: #f44040;
+  color: white;
+  padding: 27px 31px;
+  border-radius: 6px;
+  font-size: 15px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  opacity: 0;
+  animation: fadeInOut 2s forwards;
+  z-index: 9999;
+  width: 14em;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateY(10px); }
+  10% { opacity: 1; transform: translateY(0px); }
+  90% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(10px); }
+}

@@ -37,12 +37,22 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
   useClickOutside("dropdown-menu", () => setActiveDropdown(null));
   useClickOutside("context-menu", () => setContextMenu(null));
 
+  const [toast, setToast] = useState<string | null>(null);
+
+  // Auto-hide toast after 2 seconds
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 2000);
+    return () => clearTimeout(timer);
+  }, [toast]);
+
+
   useEffect(() => {
     console.log("Version:", 1.7);
   }, []);
 
   useEffect(() => {
-    console.log("cellHighlight", props.cellHighlight, data,props.ignoreValidationColumn);
+    console.log("cellHighlight", props.cellHighlight, data, props.ignoreValidationColumn);
   }, [])
 
 
@@ -286,62 +296,63 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
             </div>
           </div>
         </div>
-        <Toolbar tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton} 
-        // addRow={() => setData((prev) => [...prev, new Array(prev[0].length).fill("")])} 
-        addRow={() => setData(function(prev) {
+        <Toolbar tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton}
+          // addRow={() => setData((prev) => [...prev, new Array(prev[0].length).fill("")])} 
+          addRow={() => setData(function (prev) {
 
-  // If no rows or only header, allow adding row
-  if (prev.length <= 1) {
-    return prev.concat([ new Array(prev[0].length).fill("") ]);
-  }
+            // If no rows or only header, allow adding row
+            if (prev.length <= 1) {
+              return prev.concat([new Array(prev[0].length).fill("")]);
+            }
 
-  var headerRow = prev[0];
-  var lastRow = prev[prev.length - 1];
-  var isAnyEmpty = false;
+            var headerRow = prev[0];
+            var lastRow = prev[prev.length - 1];
+            var isAnyEmpty = false;
 
-  for (var i = 0; i < lastRow.length; i++) {
-    var header = headerRow[i];
+            for (var i = 0; i < lastRow.length; i++) {
+              var header = headerRow[i];
 
-    // If header is in ignore list → skip validation
-    if (props.ignoreValidationColumn.indexOf(header as string) !== -1) {
-      continue;
-    }
-
-    // Otherwise validate the cell
-    if (lastRow[i] === "" || lastRow[i] == null) {
-      isAnyEmpty = true;
-      break;
-    }
-  }
-
-  if (isAnyEmpty && !props.noValidaton) {
-    alert("Please fill all required cells before adding a new row.");
-    return prev; // block row add
-  }
-
-  // Add new row
-  return prev.concat([ new Array(prev[0].length).fill("") ]);
-})
-
-}
-
-        addCol={() => setData((prev) => prev.map((row) => [...row, ""]))} downloadExcel={handleDownloadExcel} downloadExcelAll={handleDownloadExcelAll} onDataLoaded={(matrix) => {
-          // Keep existing header and only update data rows
-          setData((prev) => {
-            if (prev.length === 0) return matrix;
-            const existingHeader = prev[0];
-            // Ensure imported data has same number of columns as header
-            const headerColCount = existingHeader.length;
-            const paddedMatrix = matrix.map((row) => {
-              const paddedRow = [...row];
-              while (paddedRow.length < headerColCount) {
-                paddedRow.push("");
+              // If header is in ignore list → skip validation
+              if (props.ignoreValidationColumn.indexOf(header as string) !== -1) {
+                continue;
               }
-              return paddedRow.slice(0, headerColCount);
+
+              // Otherwise validate the cell
+              if (lastRow[i] === "" || lastRow[i] == null) {
+                isAnyEmpty = true;
+                break;
+              }
+            }
+
+            if (isAnyEmpty && !props.noValidaton) {
+              setToast("Please fill all required cells before adding a new row.");
+              return prev;
+
+            }
+
+            // Add new row
+            return prev.concat([new Array(prev[0].length).fill("")]);
+          })
+
+          }
+
+          addCol={() => setData((prev) => prev.map((row) => [...row, ""]))} downloadExcel={handleDownloadExcel} downloadExcelAll={handleDownloadExcelAll} onDataLoaded={(matrix) => {
+            // Keep existing header and only update data rows
+            setData((prev) => {
+              if (prev.length === 0) return matrix;
+              const existingHeader = prev[0];
+              // Ensure imported data has same number of columns as header
+              const headerColCount = existingHeader.length;
+              const paddedMatrix = matrix.map((row) => {
+                const paddedRow = [...row];
+                while (paddedRow.length < headerColCount) {
+                  paddedRow.push("");
+                }
+                return paddedRow.slice(0, headerColCount);
+              });
+              return [existingHeader, ...paddedMatrix];
             });
-            return [existingHeader, ...paddedMatrix];
-          });
-        }} getDropdownOptions={getDropdownOptions} />
+          }} getDropdownOptions={getDropdownOptions} />
       </div>
 
       <div className="excel-scroll-container" onScroll={handleScroll}>
@@ -365,40 +376,41 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
           onClose={closeContextMenu}
           showAddRowButton={props.showAddRowButton}
           showAddColumnButton={props.showAddColumnButton}
-          onAddRow={(rowIndex) => setData(function(prev) {
+          onAddRow={(rowIndex) => setData(function (prev) {
 
-  // If no rows or only header, allow adding row
-  if (prev.length <= 1) {
-    return prev.concat([ new Array(prev[0].length).fill("") ]);
-  }
+            // If no rows or only header, allow adding row
+            if (prev.length <= 1) {
+              return prev.concat([new Array(prev[0].length).fill("")]);
+            }
 
-  var headerRow = prev[0];
-  var lastRow = prev[prev.length - 1];
-  var isAnyEmpty = false;
+            var headerRow = prev[0];
+            var lastRow = prev[prev.length - 1];
+            var isAnyEmpty = false;
 
-  for (var i = 0; i < lastRow.length; i++) {
-    var header = headerRow[i];
+            for (var i = 0; i < lastRow.length; i++) {
+              var header = headerRow[i];
 
-    // If header is in ignore list → skip validation
-    if (props.ignoreValidationColumn.indexOf(header as string) !== -1) {
-      continue;
-    }
+              // If header is in ignore list → skip validation
+              if (props.ignoreValidationColumn.indexOf(header as string) !== -1) {
+                continue;
+              }
 
-    // Otherwise validate the cell
-    if (lastRow[i] === "" || lastRow[i] == null) {
-      isAnyEmpty = true;
-      break;
-    }
-  }
+              // Otherwise validate the cell
+              if (lastRow[i] === "" || lastRow[i] == null) {
+                isAnyEmpty = true;
+                break;
+              }
+            }
 
-  if (isAnyEmpty && !props.noValidaton) {
-    alert("Please fill all required cells before adding a new row.");
-    return prev; // block row add
-  }
+            if (isAnyEmpty && !props.noValidaton) {
+              setToast("Please fill all required cells before adding a new row.");
+              return prev;
 
-  // Add new row
-  return prev.concat([ new Array(prev[0].length).fill("") ]);
-})
+            }
+
+            // Add new row
+            return prev.concat([new Array(prev[0].length).fill("")]);
+          })
 
           }
           onAddCol={(colIndex) =>
@@ -446,6 +458,14 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
       )}
 
       <Footer data={dataWithTotals} configData={configData} formulaConfig={props.formulaConfig} columnsWithTotals={columnsWithTotals} selection={selection} />
+
+      {toast && (
+        <div className="toast-popup">
+          {toast}
+        </div>
+      )}
+
+
     </div>
   );
 };
