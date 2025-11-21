@@ -42,7 +42,7 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log("cellHighlight", props.cellHighlight, data);
+    console.log("cellHighlight", props.cellHighlight, data,props.ignoreValidationColumn);
   }, [])
 
 
@@ -288,26 +288,41 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
         </div>
         <Toolbar tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton} 
         // addRow={() => setData((prev) => [...prev, new Array(prev[0].length).fill("")])} 
-        addRow={() =>
-  setData((prev) => {
-    // If no rows or only header, allow add
-    if (prev.length <= 1) {
-      return [...prev, new Array(prev[0].length).fill("")];
+        addRow={() => setData(function(prev) {
+
+  // If no rows or only header, allow adding row
+  if (prev.length <= 1) {
+    return prev.concat([ new Array(prev[0].length).fill("") ]);
+  }
+
+  var headerRow = prev[0];
+  var lastRow = prev[prev.length - 1];
+  var isAnyEmpty = false;
+
+  for (var i = 0; i < lastRow.length; i++) {
+    var header = headerRow[i];
+
+    // If header is in ignore list → skip validation
+    if (props.ignoreValidationColumn.indexOf(header as string) !== -1) {
+      continue;
     }
 
-    const lastRow = prev[prev.length - 1];
-
-    // Check if ANY column in last row is empty ("", null, undefined)
-    const isAnyEmpty = lastRow.some((cell) => cell === "" || cell == null);
-
-    if (isAnyEmpty) {
-      alert("Please fill all cells in the last row before adding a new row.");
-      return prev; // Block add row
+    // Otherwise validate the cell
+    if (lastRow[i] === "" || lastRow[i] == null) {
+      isAnyEmpty = true;
+      break;
     }
+  }
 
-    // Add row only if last row is fully filled
-    return [...prev, new Array(prev[0].length).fill("")];
-  })
+  if (isAnyEmpty && !props.noValidaton) {
+    alert("Please fill all required cells before adding a new row.");
+    return prev; // block row add
+  }
+
+  // Add new row
+  return prev.concat([ new Array(prev[0].length).fill("") ]);
+})
+
 }
 
         addCol={() => setData((prev) => prev.map((row) => [...row, ""]))} downloadExcel={handleDownloadExcel} downloadExcelAll={handleDownloadExcelAll} onDataLoaded={(matrix) => {
@@ -350,34 +365,41 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
           onClose={closeContextMenu}
           showAddRowButton={props.showAddRowButton}
           showAddColumnButton={props.showAddColumnButton}
-          onAddRow={(rowIndex) =>
-            setData((prev) => {
+          onAddRow={(rowIndex) => setData(function(prev) {
 
-    // If no rows or only header, allow add
-    if (prev.length <= 1) {
-      return [...prev, new Array(prev[0].length).fill("")];
+  // If no rows or only header, allow adding row
+  if (prev.length <= 1) {
+    return prev.concat([ new Array(prev[0].length).fill("") ]);
+  }
+
+  var headerRow = prev[0];
+  var lastRow = prev[prev.length - 1];
+  var isAnyEmpty = false;
+
+  for (var i = 0; i < lastRow.length; i++) {
+    var header = headerRow[i];
+
+    // If header is in ignore list → skip validation
+    if (props.ignoreValidationColumn.indexOf(header as string) !== -1) {
+      continue;
     }
 
-    const lastRow = prev[prev.length - 1];
-
-    // Check if ANY column in last row is empty ("", null, undefined)
-    const isAnyEmpty = lastRow.some((cell) => cell === "" || cell == null);
-
-    if (isAnyEmpty) {
-      alert("Please fill all cells in the last row before adding a new row.");
-      return prev; // Block add row
+    // Otherwise validate the cell
+    if (lastRow[i] === "" || lastRow[i] == null) {
+      isAnyEmpty = true;
+      break;
     }
+  }
 
-    // Add row only if last row is fully filled
-    return [...prev, new Array(prev[0].length).fill("")];
-  
+  if (isAnyEmpty && !props.noValidaton) {
+    alert("Please fill all required cells before adding a new row.");
+    return prev; // block row add
+  }
 
+  // Add new row
+  return prev.concat([ new Array(prev[0].length).fill("") ]);
+})
 
-
-              // const newData = [...prev];
-              // newData.splice(rowIndex + 1, 0, new Array(prev[0].length).fill(""));
-              // return updateFormulas(newData, props.formulaConfig);
-            })
           }
           onAddCol={(colIndex) =>
             setData((prev) => {

@@ -29,7 +29,9 @@ export interface ExcelGridProps {
   formulaConfig?: FormulaConfig;
   frozenColumns?: number[];
   fileSetCells?: number[];
+  ignoreValidationColumn?: string[];
   tableEditable: boolean;
+  noValidaton: boolean;
   headerEditable?: boolean;
   showAddRowButton?: boolean;
   showAddColumnButton?: boolean;

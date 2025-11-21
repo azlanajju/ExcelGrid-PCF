@@ -10,17 +10,20 @@ const constants = {
   sampleGrid: "",
   columnDefinition: "",
   columnDefinitionValue: "",
+  ignoreValidationColumn: "",
   cellHighlight: "[]",
   formulaDefiniation: "",
   tableEditable: true,
   headerEditable: true,
   showAddRowButton: true,
   showAddColumnButton: true,
+  noValidaton: false,
   sumTotalColumns: "",
   conversionCols: "",
   uploadingCell: "",
   viewingCell: "",
   columnDropdownSelected: "",
+  selectedCell: "",
   fileSetCells: "", // ✅ new
 
   header: {
@@ -58,12 +61,14 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
   private sampleGrid = constants.sampleGrid;
   private columnDefinition = constants.columnDefinition;
   private columnDefinitionValue = constants.columnDefinitionValue;
+  private ignoreValidationColumn = constants.ignoreValidationColumn;
   private cellHighlight = constants.cellHighlight;
   private formulaDefiniation = constants.formulaDefiniation;
   private tableEditable = constants.tableEditable;
   private headerEditable = constants.headerEditable;
   private showAddRowButton = constants.showAddRowButton;
   private showAddColumnButton = constants.showAddColumnButton;
+  private noValidaton = constants.noValidaton;
   private sumTotalColumns = constants.sumTotalColumns;
   private readOnlyColumns = "";
   private conversionCols = constants.conversionCols;
@@ -72,6 +77,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
   private uploadingCell: string = "";
   private viewingCell: string = "";
   columnDropdownSelected: string = "";
+  selectedCell: string = "";
 
   // Header style props
   private headerFontFamily = constants.header.fontFamily;
@@ -108,12 +114,15 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       uploadingCell: this.uploadingCell,
       viewingCell: this.viewingCell,
       columnDropdownSelected: this.columnDropdownSelected,
+      selectedCell: this.selectedCell,
       sampleGrid: this.sampleGrid,
       columnDefinitionValue: this.columnDefinitionValue,
+      ignoreValidationColumn: this.ignoreValidationColumn,
       cellHighlight: this.cellHighlight,
       columnDefinition: this.columnDefinition,
       formulaDefiniation: this.formulaDefiniation,
       tableEditable: this.tableEditable,
+      noValidaton: this.noValidaton,
       sumTotalColumns: this.sumTotalColumns,
       readOnlyColumns: this.readOnlyColumns,
       conversionCols: this.conversionCols,
@@ -147,12 +156,15 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       prev.uploadingCell !== this.uploadingCell ||
       prev.viewingCell !== this.viewingCell ||
       prev.columnDropdownSelected !== this.columnDropdownSelected ||
+      prev.selectedCell !== this.selectedCell ||
       prev.sampleGrid !== this.sampleGrid ||
       prev.columnDefinitionValue !== this.columnDefinitionValue ||
+      prev.ignoreValidationColumn !== this.ignoreValidationColumn ||
       prev.cellHighlight !== this.cellHighlight ||
       prev.columnDefinition !== this.columnDefinition ||
       prev.formulaDefiniation !== this.formulaDefiniation ||
       prev.tableEditable !== this.tableEditable ||
+      prev.noValidaton !== this.noValidaton ||
       prev.sumTotalColumns !== this.sumTotalColumns ||
       prev.readOnlyColumns !== this.readOnlyColumns ||
       prev.conversionCols !== this.conversionCols ||
@@ -188,6 +200,8 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
   }
 
   private updateGridProps(context: ComponentFramework.Context<IInputs>) {
+    console.log("ignore val", this.getOrDefault(context.parameters.ignoreValidationColumn, constants.ignoreValidationColumn),context.parameters);
+    
     // Header styles
     this.headerFontFamily = this.getOrDefault(context.parameters.headerFontFamily, constants.header.fontFamily);
     this.headerFontSize = this.getOrDefault(context.parameters.headerFontSize, constants.header.fontSize);
@@ -215,13 +229,16 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
     this.viewingCell = this.getOrDefault(context.parameters.viewingCell, constants.viewingCell);
 
     this.columnDropdownSelected = this.getOrDefault(context.parameters.columnDropdownSelected, constants.columnDropdownSelected);
+    this.selectedCell = this.getOrDefault(context.parameters.selectedCell, constants.selectedCell);
 
     this.sampleGrid = this.getOrDefault(context.parameters.gridInput, constants.sampleGrid);
     this.columnDefinitionValue = this.getOrDefault(context.parameters.columnDefinitionValue, constants.columnDefinitionValue);
+    this.ignoreValidationColumn = this.getOrDefault(context.parameters.ignoreValidationColumn, constants.ignoreValidationColumn);
     this.cellHighlight = this.getOrDefault(context.parameters.cellHighlight, constants.cellHighlight);
     this.columnDefinition = this.getOrDefault(context.parameters.columnDefinition, constants.columnDefinition);
     this.formulaDefiniation = this.getOrDefault(context.parameters.formulaDefiniation, constants.formulaDefiniation);
     this.tableEditable = this.getOrDefault(context.parameters.tableEditable, constants.tableEditable);
+    this.noValidaton = this.getOrDefault(context.parameters.noValidaton, constants.noValidaton);
     this.headerEditable = this.getOrDefault(context.parameters.headerEditable, constants.headerEditable);
     this.showAddRowButton = this.getOrDefault(context.parameters.showAddRowButton, constants.showAddRowButton);
     this.showAddColumnButton = this.getOrDefault(context.parameters.showAddColumnButton, constants.showAddColumnButton);
@@ -263,6 +280,12 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
               .split(";")
               .filter((val) => val !== "")
           : [],
+          ignoreValidationColumn: this.ignoreValidationColumn
+          ? this.ignoreValidationColumn
+              .trim()
+              .split(";")
+              .filter((val) => val !== "")
+          : [],
         cellHighlight: this.cellHighlight ? JSON.parse(this.cellHighlight) : undefined,
         formulaConfig: this.formulaDefiniation ? JSON.parse(this.formulaDefiniation) : undefined,
         sumTotalColumns: this.sumTotalColumns
@@ -273,6 +296,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
         readOnlyColumns: readOnlyColumnsArray,
         conversionCols: this.conversionCols ? JSON.parse(this.conversionCols) : undefined,
         tableEditable: this.tableEditable,
+        noValidaton: this.noValidaton,
         headerEditable: this.headerEditable,
         showAddRowButton: this.showAddRowButton,
         showAddColumnButton: this.showAddColumnButton,
@@ -303,11 +327,13 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
           this.notifyOutputChanged();
         },
 
-        onCellDropDown: (row: string, col: string, isReset = false) => {
+        onCellDropDown: (row: string, col: string, isReset = false,isCell="No") => {
           if (!isReset) {
-            this.columnDropdownSelected = `${col};${row}`;
+            if (isCell == "No") this.columnDropdownSelected = `${col};${row}`;
+            this.selectedCell = `${col};${row}`;
           } else {
-            this.columnDropdownSelected = "";
+            if (isCell == "No") this.columnDropdownSelected = "";
+            this.selectedCell = "";
           }
           this.notifyOutputChanged();
         },
@@ -342,6 +368,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       uploadingCell: this.uploadingCell,
       viewingCell: this.viewingCell,
       columnDropdownSelected: this.columnDropdownSelected,
+      selectedCell: this.selectedCell,
       columnOrder: this.columnOrder,
     };
   }

@@ -10,12 +10,15 @@
 
     <property name="columnDefinition" display-name-key="Column-Dropdown-Definition" description-key="Columns with drop downs ; saperated" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="columnDropdownSelected" display-name-key="Column-Dropdown-Selected" description-key="Currently selcted column" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="selectedCell" display-name-key="Selected-Cell" description-key="Currently selcted cell" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="columnDefinitionValue" display-name-key="Column-Dropdown-Value" description-key="Columns with drop down vlues ; saperated" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="cellHighlight" display-name-key="Cell-Highlight-Value" description-key="Cells with Highlighted borders in string of arrays" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="ignoreValidationColumn" display-name-key="Columns to ignore validation" description-key="Columns to ignore add row validation" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="formulaDefiniation" display-name-key="Formula-Definition" description-key="Json definiation for defining formulas" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="tableEditable" display-name-key="Editable-Table" description-key="Boolean to set table is editable or not" of-type="TwoOptions" usage="bound" required="false" />
     <property name="headerEditable" display-name-key="Header-Editable" description-key="Allow editing of header cells" of-type="TwoOptions" usage="input" required="false" />
     <property name="showAddRowButton" display-name-key="Show-Add-Row-Button" description-key="Show Add Row button in toolbar and context menu" of-type="TwoOptions" usage="input" required="false" />
+    <property name="noValidaton" display-name-key="No-Validation" description-key="Define if validation is needed" of-type="TwoOptions" usage="input" required="false" />
     <property name="showAddColumnButton" display-name-key="Show-Add-Column-Button" description-key="Show Add Column button in toolbar and context menu" of-type="TwoOptions" usage="input" required="false" />
     <property name="sumTotalColumns" display-name-key="Totaled-Columns" description-key="Columns with total sumed semicolon sapearated" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="readOnlyColumns" display-name-key="Read-Only-Columns" description-key="Columns that are read-only (view-only), semicolon separated column indices" of-type="SingleLine.Text" usage="bound" required="false" />

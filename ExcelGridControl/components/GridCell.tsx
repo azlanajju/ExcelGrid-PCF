@@ -20,7 +20,7 @@ interface GridCellProps {
   onMouseDown: () => void;
   onMouseUp: () => void;
   onMouseOver: () => void;
-  onCellDropDown: (row: string, col: string) => void;
+  onCellDropDown: (row: string, col: string,isReset?:boolean,isCell?:string) => void;
   onContextMenu: (e: React.MouseEvent) => void;
   onClick: (e: React.MouseEvent) => void;
   onChange: (value: string) => void;
@@ -201,6 +201,7 @@ export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selecte
       onClick={(e) => {
         onClick(e);
         if (hasDropdown) onCellDropDown(id, headerVal);
+        onCellDropDown(id, headerVal,false,"Yes");
       }}
       ref={(el) => {
         colRefs.current[col] = el!;
