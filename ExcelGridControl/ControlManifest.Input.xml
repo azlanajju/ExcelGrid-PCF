@@ -10,8 +10,9 @@
 
     <property name="columnDefinition" display-name-key="Column-Dropdown-Definition" description-key="Columns with drop downs ; saperated" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="columnDropdownSelected" display-name-key="Column-Dropdown-Selected" description-key="Currently selcted column" of-type="SingleLine.Text" usage="bound" required="false" />
-    <property name="selectedCell" display-name-key="Selected-Cell" description-key="Currently selcted cell" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="columnDefinitionValue" display-name-key="Column-Dropdown-Value" description-key="Columns with drop down vlues ; saperated" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="dropDownDelay" display-name-key="Dropdown-Delay-ms" description-key="Delay to appear drop down window in mllisecs" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="selectedCell" display-name-key="Selected-Cell" description-key="Currently selcted cell" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="cellHighlight" display-name-key="Cell-Highlight-Value" description-key="Cells with Highlighted borders in string of arrays" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="ignoreValidationColumn" display-name-key="Columns to ignore validation" description-key="Columns to ignore add row validation" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="formulaDefiniation" display-name-key="Formula-Definition" description-key="Json definiation for defining formulas" of-type="SingleLine.Text" usage="bound" required="false" />

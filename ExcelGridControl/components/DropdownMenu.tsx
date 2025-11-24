@@ -9,6 +9,7 @@ interface DropdownMenuProps {
   tableEditable: boolean;
   tableRef: React.RefObject<HTMLTableElement>;
   endSelection: () => void;
+  dropDownDelay: number;
 }
 
 export const DropdownMenu: React.FC<DropdownMenuProps> = ({
@@ -18,7 +19,8 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   position,
   tableEditable,
   tableRef,
-  endSelection
+  endSelection,
+  dropDownDelay
 }) => {
   const [adjustedPosition, setAdjustedPosition] = useState<{
     top: number;
@@ -66,7 +68,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
     });
 
     // small delay before making dropdown visible
-    const timer = setTimeout(() => setVisible(true), 35);
+    const timer = setTimeout(() => setVisible(true), dropDownDelay);
 
     return () => clearTimeout(timer);
   }, [position, activeDropdown, tableRef]);
@@ -107,7 +109,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
         top: `${adjustedPosition.top}px`,
         left: `${adjustedPosition.left}px`,
         width: `${adjustedPosition.width}px`,
-        maxHeight: `${adjustedPosition.maxHeight}px`,
+        maxHeight: activeDropdown.filteredOptions.length===1 ? '40vh' : `${adjustedPosition.maxHeight}px`,
         overflowY: "auto",
         zIndex: 1001,
       }}

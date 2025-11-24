@@ -35,6 +35,7 @@ export interface ExcelGridProps {
   headerEditable?: boolean;
   showAddRowButton?: boolean;
   showAddColumnButton?: boolean;
+  dropDownDelay? : number;
   sumTotalColumns: number[];
   readOnlyColumns?: number[];
   frozenColumnsString: string;

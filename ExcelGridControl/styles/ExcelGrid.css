@@ -427,6 +427,9 @@
 
   flex-wrap: wrap;
   gap: 5px;
+
+
+  display: none;
 }
 
 .excel-info {
@@ -559,7 +562,7 @@
 }
 
 .dropdown-cell {
-  cursor: pointer;
+  cursor: pointer !important;
 }
 
 .dropdown-arrow {
@@ -573,6 +576,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  cursor: pointer !important;
 }
 
 .dropdown-arrow svg {
@@ -905,7 +909,8 @@
 .toast-popup {
   position: fixed;
   top: 20px;
-  left: calc(50% - 14em);
+  left: 50%;
+  transform: translateX(-50%);
   background: #f44040;
   color: white;
   padding: 27px 31px;
@@ -915,7 +920,7 @@
   opacity: 0;
   animation: fadeInOut 2s forwards;
   z-index: 9999;
-  width: 14em;
+  width: max(14em,60vw);
 }
 
 @keyframes fadeInOut {
@@ -923,4 +928,9 @@
   10% { opacity: 1; transform: translateY(0px); }
   90% { opacity: 1; }
   100% { opacity: 0; transform: translateY(10px); }
+}
+
+
+.dropdown-input{
+    cursor: pointer !important;
 }

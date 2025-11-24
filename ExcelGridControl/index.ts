@@ -23,6 +23,7 @@ const constants = {
   uploadingCell: "",
   viewingCell: "",
   columnDropdownSelected: "",
+  dropDownDelay: "100",
   selectedCell: "",
   fileSetCells: "", // ✅ new
 
@@ -76,6 +77,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
 
   private uploadingCell: string = "";
   private viewingCell: string = "";
+  private dropDownDelay:string = "100";
   columnDropdownSelected: string = "";
   selectedCell: string = "";
 
@@ -113,6 +115,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       fileSetCells: this.fileSetCells, // ✅ track
       uploadingCell: this.uploadingCell,
       viewingCell: this.viewingCell,
+      dropDownDelay: this.dropDownDelay,
       columnDropdownSelected: this.columnDropdownSelected,
       selectedCell: this.selectedCell,
       sampleGrid: this.sampleGrid,
@@ -155,6 +158,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       prev.fileSetCells !== this.fileSetCells || // ✅ check
       prev.uploadingCell !== this.uploadingCell ||
       prev.viewingCell !== this.viewingCell ||
+      prev.dropDownDelay !== this.dropDownDelay ||
       prev.columnDropdownSelected !== this.columnDropdownSelected ||
       prev.selectedCell !== this.selectedCell ||
       prev.sampleGrid !== this.sampleGrid ||
@@ -227,6 +231,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
 
     this.uploadingCell = this.getOrDefault(context.parameters.uploadingCell, constants.uploadingCell);
     this.viewingCell = this.getOrDefault(context.parameters.viewingCell, constants.viewingCell);
+    this.dropDownDelay = this.getOrDefault(context.parameters.dropDownDelay, constants.dropDownDelay);
 
     this.columnDropdownSelected = this.getOrDefault(context.parameters.columnDropdownSelected, constants.columnDropdownSelected);
     this.selectedCell = this.getOrDefault(context.parameters.selectedCell, constants.selectedCell);
@@ -304,6 +309,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
         frozenColumnsString: this.frozenColumns,
         fileSetCells: fileSetCellsArray,
         columnOrder: this.columnOrder,
+        dropDownDelay: parseInt(this.dropDownDelay),
 
         onDataChange: (data: string[][], frozenColumns = "", fileSetCells = "") => {
           this.sampleGrid = JSON.stringify(data);

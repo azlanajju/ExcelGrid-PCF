@@ -367,7 +367,7 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
           cellRefs={cellRefs} colRefs={colRefs} conversionConfig={props.conversionCols} onFileUpdload={props.onFileUpdload}
           onFileView={props.onFileView} onCellDropDown={props.onCellDropDown} getCellAlignment={getCellAlignment} cellHighlight={props.cellHighlight} {...props} />
 
-        {activeDropdown && <DropdownMenu activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection} />}
+        {activeDropdown && <DropdownMenu activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection} dropDownDelay={props.dropDownDelay} />}
       </div>
 
       {contextMenu && (
