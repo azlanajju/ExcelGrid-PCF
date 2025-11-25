@@ -10,6 +10,10 @@ interface DropdownMenuProps {
   tableRef: React.RefObject<HTMLTableElement>;
   endSelection: () => void;
   dropDownDelay: number;
+
+  // NEW — passed from parent
+  mousePos: { x: number; y: number };
+  onCellDropDown: (row: string, col: string, isReset?: boolean) => void;
 }
 
 export const DropdownMenu: React.FC<DropdownMenuProps> = ({
@@ -20,7 +24,9 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   tableEditable,
   tableRef,
   endSelection,
-  dropDownDelay
+  dropDownDelay,
+  mousePos,
+  onCellDropDown
 }) => {
   const [adjustedPosition, setAdjustedPosition] = useState<{
     top: number;
@@ -31,10 +37,23 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
 
   const [visible, setVisible] = useState(false);
 
+  // Mouse hover tracking
+  const [mouseInside, setMouseInside] = useState(false);
+
+  // Extra detection margin top/bottom
+  const EXTRA_MARGIN = 1200;
+
+  /** ---------------------------
+   * POSITION CALCULATION
+   * --------------------------- */
   useEffect(() => {
     if (!tableRef.current || !activeDropdown) return;
 
-    const dropdownHeight = activeDropdown.filteredOptions.length===0 ? 38 : activeDropdown.filteredOptions.length * 30 + 10;
+    const dropdownHeight =
+      activeDropdown.filteredOptions.length === 0
+        ? 38
+        : activeDropdown.filteredOptions.length * 30 + 10;
+
     const viewportHeight = window.innerHeight;
     const viewportWidth = window.innerWidth;
 
@@ -42,7 +61,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
     let adjustedLeft = position.left;
     let maxHeight = dropdownHeight;
 
-    // ✅ If dropdown would overflow bottom, move it above or shrink height
+    // Prevent bottom overflow
     if (position.top + dropdownHeight > viewportHeight) {
       const spaceAbove = position.top;
       const spaceBelow = viewportHeight - position.top;
@@ -55,7 +74,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
       }
     }
 
-    // ✅ Prevent overflow on the right side
+    // Prevent right overflow
     if (position.left + position.width > viewportWidth) {
       adjustedLeft = Math.max(0, viewportWidth - position.width - 10);
     }
@@ -67,21 +86,51 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
       maxHeight,
     });
 
-    // small delay before making dropdown visible
     const timer = setTimeout(() => setVisible(true), dropDownDelay);
-
     return () => clearTimeout(timer);
   }, [position, activeDropdown, tableRef]);
 
-  // 🔹 Auto-close on scroll/resize (except if scroll is inside dropdown)
+
+  /** ---------------------------
+   * MOUSE TRACKING (uses parent mousePos)
+   * --------------------------- */
+  useEffect(() => {
+    if (!activeDropdown || !adjustedPosition) return;
+
+    const { x, y } = mousePos;
+
+    const rect = {
+      left: adjustedPosition.left,
+      right: adjustedPosition.left + adjustedPosition.width,
+      top: adjustedPosition.top - EXTRA_MARGIN,
+      bottom: adjustedPosition.top + adjustedPosition.maxHeight + EXTRA_MARGIN
+    };
+
+    const inside =
+      x >= rect.left &&
+      x <= rect.right &&
+      y >= rect.top &&
+      y <= rect.bottom;
+
+    setMouseInside(inside);
+
+    if (!inside) {
+      setActiveDropdown(null);
+      onCellDropDown("","",true);
+    }
+  }, [mousePos, activeDropdown, adjustedPosition]);
+
+
+  /** ---------------------------
+   * CLOSE ON SCROLL / RESIZE
+   * --------------------------- */
   useEffect(() => {
     if (!activeDropdown) return;
 
     const handleScroll = (event: Event) => {
       const target = event.target as HTMLElement | Document;
-      if (target instanceof HTMLElement && target.closest(".dropdown-menu")) {
-        return; // ignore scrolls inside dropdown
-      }
+      if (target instanceof HTMLElement && target.closest(".dropdown-menu"))
+        return;
       setActiveDropdown(null);
     };
 
@@ -96,11 +145,24 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
     };
   }, [activeDropdown, setActiveDropdown]);
 
-  // ❌ Don’t render until editable, dropdown active, position calculated, and visible
-  if (!activeDropdown || !tableEditable || !adjustedPosition || !visible) {
+
+  /** ---------------------------
+   * DON'T RENDER UNTIL CONDITIONS MET
+   * --------------------------- */
+  if (
+    !activeDropdown ||
+    !tableEditable ||
+    !adjustedPosition ||
+    !visible ||
+    !mouseInside
+  ) {
     return null;
   }
 
+
+  /** ---------------------------
+   * RENDER DROPDOWN MENU
+   * --------------------------- */
   return (
     <div
       className="dropdown-menu"
@@ -109,9 +171,12 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
         top: `${adjustedPosition.top}px`,
         left: `${adjustedPosition.left}px`,
         width: `${adjustedPosition.width}px`,
-        maxHeight: activeDropdown.filteredOptions.length===1 ? '40vh' : `${adjustedPosition.maxHeight}px`,
+        maxHeight:
+          activeDropdown.filteredOptions.length === 1
+            ? "40vh"
+            : `${adjustedPosition.maxHeight}px`,
         overflowY: "auto",
-        zIndex: 1001,
+        zIndex: 1001
       }}
       onClick={(e) => e.stopPropagation()}
     >
@@ -126,10 +191,6 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
           </div>
         ))
       ) : (
-        // <div className="dropdown-option dropdown-no-options">
-        //   No matching options
-        // </div>
-
         <div className="dropdown-loader">
           <div className="spinner" />
           <span>Loading options...</span>

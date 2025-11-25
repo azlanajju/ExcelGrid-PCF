@@ -310,6 +310,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
         fileSetCells: fileSetCellsArray,
         columnOrder: this.columnOrder,
         dropDownDelay: parseInt(this.dropDownDelay),
+        selectedCell: this.selectedCell,
 
         onDataChange: (data: string[][], frozenColumns = "", fileSetCells = "") => {
           this.sampleGrid = JSON.stringify(data);
@@ -340,6 +341,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
           } else {
             if (isCell == "No") this.columnDropdownSelected = "";
             this.selectedCell = "";
+            this.columnDefinitionValue="";
           }
           this.notifyOutputChanged();
         },
@@ -375,6 +377,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       viewingCell: this.viewingCell,
       columnDropdownSelected: this.columnDropdownSelected,
       selectedCell: this.selectedCell,
+      columnDefinitionValue: this.columnDefinitionValue,
       columnOrder: this.columnOrder,
     };
   }
