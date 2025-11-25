@@ -1,7 +1,7 @@
 import isEqual from "lodash.isequal";
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ContextMenu } from "./components/ContextMenu";
-import { DropdownMenu } from "./components/DropdownMenu";
+import { DropdownMenu } from "./components/DropdownMenu copy";
 import { Footer } from "./components/Footer";
 import { GridTable } from "./components/GridTable";
 import { Toolbar } from "./components/Toolbar";
@@ -380,7 +380,7 @@ useEffect(() => {
           cellRefs={cellRefs} colRefs={colRefs} conversionConfig={props.conversionCols} onFileUpdload={props.onFileUpdload}
           onFileView={props.onFileView} onCellDropDown={props.onCellDropDown} getCellAlignment={getCellAlignment} cellHighlight={props.cellHighlight} {...props} />
 
-        {activeDropdown && <DropdownMenu  activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection} dropDownDelay={props.dropDownDelay} />}
+        {activeDropdown && <DropdownMenu onCellDropDown={props.onCellDropDown} mousePos={mousePos}  activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection} dropDownDelay={props.dropDownDelay} />}
       </div>
 
       {contextMenu && (
