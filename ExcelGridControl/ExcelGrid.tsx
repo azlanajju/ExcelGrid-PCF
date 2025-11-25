@@ -139,7 +139,7 @@ useEffect(() => {
         // Check if header editing is enabled (defaults to true for backward compatibility)
         return props.headerEditable !== false;
       }
-      // if (hasFormula(col, props.formulaConfig)) return false;
+      if (hasFormula(col, props.formulaConfig)) return false;
       if (data[row] && data[row][0] === "Total") return false;
       return true;
     },

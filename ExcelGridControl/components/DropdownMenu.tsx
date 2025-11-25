@@ -41,7 +41,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   const [mouseInside, setMouseInside] = useState(false);
 
   // Extra detection margin top/bottom
-  const EXTRA_MARGIN = 1200;
+  const EXTRA_MARGIN = 12000;
 
   /** ---------------------------
    * POSITION CALCULATION

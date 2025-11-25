@@ -42,7 +42,7 @@ const constants = {
     fontFamily: "inherit",
     fontSize: "12px",
     fontStyle: "normal",
-    fontWeight: "600",
+    fontWeight: "400",
     textColor: "#020617",
     backgroundColor: "#ffffff",
     borderColor: "#e2e8f0",
