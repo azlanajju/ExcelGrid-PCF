@@ -24,8 +24,11 @@ export interface ExcelGridProps {
   onFileView: (row: string, col: string, currVal: string) => void;
   inputGrid?: Cell[][] | string;
   gridConfig?: number[];
+  multiLineCols?: number[];
+  numberCols?: number[];
   gridConfigVals?: string[];
   cellHighlight?: string[];
+  cellsDisabled?: string[];
   formulaConfig?: FormulaConfig;
   frozenColumns?: number[];
   fileSetCells?: number[];

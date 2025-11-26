@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Cell, ConversionConfig } from "../types";
 import { GridCell } from "./GridCell";
 
@@ -8,6 +8,8 @@ interface GridTableProps {
   focusedCell: [number, number] | null;
   frozenCols: number[];
   fileSetCells: number[];
+  numberCols: number[];
+  multiLineCols: number[];
   configData: any;
   tableEditable: boolean;
   headerStyle: any;
@@ -37,10 +39,11 @@ interface GridTableProps {
   conversionConfig: ConversionConfig;
   rowIds: Record<number, string>;
   getCellAlignment: (row: number, col: number) => { textAlign: "left" | "center" | "right" | "justify" };
-  cellHighlight : string[]
+  cellHighlight : string[];
+  cellsDisabled: string[];
 }
 
-export const GridTable: React.FC<GridTableProps> = ({ data, selection, focusedCell, frozenCols, fileSetCells, configData, tableEditable, headerStyle, bodyStyle, onCellClick, onCellChange, onCellFocus, onContextMenu, onMouseDown, onMouseUp, onMouseOver, startResize, hasDropdownOptions, hasFormula, hasUpload, getFormula, validateAndCorrectValue, isCellEditable, colWidths, getFrozenLeft, tableRef, colRefs, cellRefs, conversionConfig, onFileUpdload, onFileView, onCellDropDown, rowIds, getCellAlignment, cellHighlight, ...props }) => {
+export const GridTable: React.FC<GridTableProps> = ({ data, selection, focusedCell, frozenCols, fileSetCells,numberCols,multiLineCols, configData, tableEditable, headerStyle, bodyStyle, onCellClick, onCellChange, onCellFocus, onContextMenu, onMouseDown, onMouseUp, onMouseOver, startResize, hasDropdownOptions, hasFormula, hasUpload, getFormula, validateAndCorrectValue, isCellEditable, colWidths, getFrozenLeft, tableRef, colRefs, cellRefs, conversionConfig, onFileUpdload, onFileView, onCellDropDown, rowIds, getCellAlignment, cellHighlight,cellsDisabled,  ...props }) => {
   const getSelectedRange = () => {
     if (!selection) return null;
     const [r1, c1] = selection.start;
@@ -55,6 +58,11 @@ export const GridTable: React.FC<GridTableProps> = ({ data, selection, focusedCe
   const range = getSelectedRange();
   const headerRow = data[0];
 
+  useEffect(()=>{
+    console.log("multiLineCols",multiLineCols,numberCols);
+    
+  },[multiLineCols,numberCols])
+
   return (
     <table className="excel-table" ref={tableRef}>
       <tbody className="table-body">
@@ -65,9 +73,10 @@ export const GridTable: React.FC<GridTableProps> = ({ data, selection, focusedCe
                 const headerVal = headerRow[cIdx] as string;
 
                 const highlighted = cellHighlight.indexOf(headerVal + ";" + rIdx) !== -1;
+                const disabled = cellsDisabled.indexOf(headerVal + ";" + rIdx) !== -1;
                 const selected = range && rIdx >= range.top && rIdx <= range.bottom && cIdx >= range.left && cIdx <= range.right;
                 const focused = focusedCell && focusedCell[0] === rIdx && focusedCell[1] === cIdx;
-                const isEditable = isCellEditable(rIdx, cIdx);
+                const isEditable = isCellEditable(rIdx, cIdx) && !disabled;
                 const hasDropdown = hasDropdownOptions(cIdx) && rIdx > 0 && !hasFormula(cIdx) && isEditable;
                 const isFormula = hasFormula(cIdx);
                 const cellHasUpload = hasUpload(cIdx);
@@ -85,7 +94,7 @@ export const GridTable: React.FC<GridTableProps> = ({ data, selection, focusedCe
                 startResize={startResize} formula={isFormula ? getFormula(cIdx) : undefined} 
                 frozenLeft={frozenCols.includes(cIdx) ? getFrozenLeft(cIdx) : 0} colRefs={colRefs} cellRefs={cellRefs} 
                 tableRef={tableRef} onFileUpdload={onFileUpdload} onFileView={onFileView} headerVal={headerVal} 
-                isHighlighted={highlighted} {...props} />;
+                isHighlighted={highlighted} disabled={disabled} isMultiLineInput={multiLineCols.includes(cIdx)} isNumber={numberCols.includes(cIdx)} {...props} />;
               })} 
             </tr>
           );

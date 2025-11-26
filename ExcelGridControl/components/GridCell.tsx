@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface GridCellProps {
   value: string | number;
@@ -37,10 +37,84 @@ interface GridCellProps {
   headerVal: string;
   rowIds: Record<number, string>;
   isHighlighted: boolean;
+  disabled: boolean;
+  isMultiLineInput?:boolean;
+  isNumber?:boolean;
 }
 
-export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selected, focused, frozen, fileSetCell, hasDropdown, hasUpload, isFormula, isEditable, isTotalRow, headerStyle, bodyStyle, textAlign = "center", onMouseDown, onMouseOver, onMouseUp, onContextMenu, onClick, onChange, onFocus, onBlur, startResize, frozenLeft, colRefs, cellRefs, tableRef, onFileUpdload, onFileView, headerVal, onCellDropDown,isHighlighted }) => {
+export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selected, focused, frozen, fileSetCell, hasDropdown, hasUpload, isFormula, isEditable, isTotalRow, headerStyle, bodyStyle, textAlign = "center", onMouseDown, onMouseOver, onMouseUp, onContextMenu, onClick, onChange, onFocus, onBlur, startResize, frozenLeft, colRefs, cellRefs, tableRef, onFileUpdload, onFileView, headerVal, onCellDropDown,isHighlighted,disabled,isMultiLineInput=false,isNumber=false }) => {
   const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null);
+  const [isUsing,setIsUsing] = useState(false);
+
+  
+
+  useEffect(() => {
+  const handleClickOutside = (event: MouseEvent) => {
+    if (!cellRefs.current[row] || !cellRefs.current[row][col]) return;
+
+    const cellElement = cellRefs.current[row][col];
+
+    // If clicked outside the cell, reset
+    if (cellElement && !cellElement.contains(event.target as Node)) {
+      setIsUsing(false);
+    }
+  };
+
+  
+
+  document.addEventListener("mousedown", handleClickOutside);
+
+  return () => {
+    document.removeEventListener("mousedown", handleClickOutside);
+  };
+}, [row, col, cellRefs]);
+
+useEffect(() => {
+  const cellEl = cellRefs.current[row]?.[col];
+  if (!cellEl) return;
+
+  let isMouseDown = false;
+
+  const handlePointerDown = (e: PointerEvent) => {
+    isMouseDown = true;
+
+    // If pointerdown happens on this cell => activate
+    if (cellEl.contains(e.target as Node)) {
+      setIsUsing(true);
+    } else {
+      setIsUsing(false);
+    }
+  };
+
+  const handlePointerMove = (e: PointerEvent) => {
+    if (!isMouseDown) return;
+
+    const isInside = cellEl.contains(e.target as Node);
+
+    // If dragging INTO this cell => turn on
+    if (isInside) {
+      setIsUsing(true);
+    } else {
+      // If dragging OUT => turn off
+      setIsUsing(false);
+    }
+  };
+
+  const handlePointerUp = () => {
+    isMouseDown = false;
+  };
+
+  document.addEventListener("pointerdown", handlePointerDown);
+  document.addEventListener("pointermove", handlePointerMove);
+  document.addEventListener("pointerup", handlePointerUp);
+
+  return () => {
+    document.removeEventListener("pointerdown", handlePointerDown);
+    document.removeEventListener("pointermove", handlePointerMove);
+    document.removeEventListener("pointerup", handlePointerUp);
+  };
+}, [row, col, cellRefs]);
+
 
   // ---- Styles ----
   const cellStyle: React.CSSProperties =
@@ -76,6 +150,7 @@ export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selecte
           left: frozen ? frozenLeft : 0,
           textAlign: textAlign,
           display: "table-cell",
+          // height: "44px"
         };
 
   // ---- Effects ----
@@ -111,7 +186,33 @@ export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selecte
     />
   );
 
-  const renderNormalInput = () => (
+  const renderNormalInput = () => {
+  if (isNumber) {
+    return (
+    <input
+    type="number"
+    ref={inputRef as React.RefObject<HTMLInputElement>}
+    value={String(value)}
+    onChange={(e) => onChange(e.target.value)}
+    onFocus={onFocus}
+    onBlur={onBlur}
+    readOnly={!isEditable || isTotalRow}
+    className={`excel-input ${selected ? "selected" : ""} ${frozen ? "frozen" : ""}`}
+    style={{
+      ...cellStyle,
+      width: "100%",
+      height: "100%",
+      border: "none",
+      background: "transparent",
+      textAlign: "right",
+      appearance: "none",
+      MozAppearance: "textfield",
+    }}
+  />
+    );
+  }
+
+  return (
     <textarea
       ref={inputRef as React.RefObject<HTMLTextAreaElement>}
       value={String(value)}
@@ -119,23 +220,24 @@ export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selecte
       onFocus={onFocus}
       onBlur={onBlur}
       readOnly={!isEditable || isTotalRow}
-      className={`excel-input ${selected ? "selected" : ""} ${frozen ? "frozen" : ""} ${hasDropdown ? "dropdown-input" : ""} ${isFormula ? "formula-input" : ""}`}
+      className={`excel-input ${isMultiLineInput ? '' : 'excel-input-fixed-height'} ${selected ? "selected" : ""} ${frozen ? "frozen" : ""} ${hasDropdown ? "dropdown-input" : ""} ${isFormula ? "formula-input" : ""}`}
       style={{
-          boxShadow: isHighlighted ? "inset 0 0 0px 3px #dd0000e5" : "",
+        boxShadow: isHighlighted ? "inset 0 0 0px 3px #dd0000e5" : "",
         ...cellStyle,
         width: "100%",
-        borderTop: selected || focused ? "1px solid #e1e7ff" : "0px solid #e2e8f0",
+        resize: "none",
+        height: "100%",
         position: "relative",
         zIndex: selected || focused ? 10 : frozen ? 20 : 0,
         left: "0px",
-        textAlign: textAlign,
-        resize: "none",
-        height: "100%",
+        textAlign: "left",
         border: "none",
         background: "transparent",
       }}
     />
   );
+};
+
 
   const renderUploadSection = () => (
     <div
@@ -189,14 +291,15 @@ export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selecte
   // ---- Main render ----
   return (
     <td
-      className={`excel-cell ${frozen ? "frozen" : ""} ${selected ? "selected" : ""} ${focused ? "focused" : ""} ${hasDropdown ? "dropdown-cell" : ""} ${isFormula ? "formula-cell" : ""} ${!isEditable ? "readonly-cell" : ""} ${isTotalRow ? "total-cell" : ""}`}
+      className={`excel-cell ${frozen ? "frozen" : ""} ${selected && !isUsing ? "selected" : ""} ${focused ? "focused" : ""} ${hasDropdown ? "dropdown-cell" : ""} ${isFormula ? "formula-cell" : ""} ${!isEditable ? "readonly-cell" : ""} ${isTotalRow ? "total-cell" : ""}`}
       style={{ ...cellStyle, height: "28px" }}
       onMouseDown={(e) => {
         if ((e.target as HTMLElement).closest(".dropdown-menu")) return;
+        setIsUsing(true);
         onMouseDown();
       }}
       onMouseOver={onMouseOver}
-      onMouseUp={onMouseUp}
+      onMouseUp={(e)=>{ onMouseUp()}}
       onContextMenu={onContextMenu}
       onClick={(e) => {
         onClick(e);

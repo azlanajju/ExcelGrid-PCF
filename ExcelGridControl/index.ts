@@ -9,6 +9,9 @@ const constants = {
   frozenColumns: "",
   sampleGrid: "",
   columnDefinition: "",
+  numberCols: "",
+  multiLineCols: "",
+  cellsDisabled: "[]",
   columnDefinitionValue: "",
   ignoreValidationColumn: "",
   cellHighlight: "[]",
@@ -61,6 +64,9 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
   private fileSetCells = constants.fileSetCells;
   private sampleGrid = constants.sampleGrid;
   private columnDefinition = constants.columnDefinition;
+  private multiLineCols = constants.multiLineCols;
+  private cellsDisabled = constants.cellsDisabled;
+  private numberCols = constants.numberCols;
   private columnDefinitionValue = constants.columnDefinitionValue;
   private ignoreValidationColumn = constants.ignoreValidationColumn;
   private cellHighlight = constants.cellHighlight;
@@ -122,7 +128,10 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       columnDefinitionValue: this.columnDefinitionValue,
       ignoreValidationColumn: this.ignoreValidationColumn,
       cellHighlight: this.cellHighlight,
+      cellsDisabled: this.cellsDisabled,
       columnDefinition: this.columnDefinition,
+      numberCols: this.numberCols,
+      multiLineCols: this.multiLineCols,
       formulaDefiniation: this.formulaDefiniation,
       tableEditable: this.tableEditable,
       noValidaton: this.noValidaton,
@@ -165,7 +174,10 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       prev.columnDefinitionValue !== this.columnDefinitionValue ||
       prev.ignoreValidationColumn !== this.ignoreValidationColumn ||
       prev.cellHighlight !== this.cellHighlight ||
+      prev.cellsDisabled !== this.cellsDisabled ||
       prev.columnDefinition !== this.columnDefinition ||
+      prev.multiLineCols !== this.multiLineCols ||
+      prev.numberCols !== this.numberCols ||
       prev.formulaDefiniation !== this.formulaDefiniation ||
       prev.tableEditable !== this.tableEditable ||
       prev.noValidaton !== this.noValidaton ||
@@ -240,7 +252,10 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
     this.columnDefinitionValue = this.getOrDefault(context.parameters.columnDefinitionValue, constants.columnDefinitionValue);
     this.ignoreValidationColumn = this.getOrDefault(context.parameters.ignoreValidationColumn, constants.ignoreValidationColumn);
     this.cellHighlight = this.getOrDefault(context.parameters.cellHighlight, constants.cellHighlight);
+    this.cellsDisabled = this.getOrDefault(context.parameters.cellsDisabled, constants.cellsDisabled);
     this.columnDefinition = this.getOrDefault(context.parameters.columnDefinition, constants.columnDefinition);
+    this.numberCols = this.getOrDefault(context.parameters.numberCols, constants.numberCols);
+    this.multiLineCols = this.getOrDefault(context.parameters.multiLineCols, constants.multiLineCols);
     this.formulaDefiniation = this.getOrDefault(context.parameters.formulaDefiniation, constants.formulaDefiniation);
     this.tableEditable = this.getOrDefault(context.parameters.tableEditable, constants.tableEditable);
     this.noValidaton = this.getOrDefault(context.parameters.noValidaton, constants.noValidaton);
@@ -279,6 +294,20 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
               .filter((val) => val !== "")
               .map((val) => Number(val))
           : [],
+           numberCols: this.numberCols
+          ? this.numberCols
+              .trim()
+              .split(";")
+              .filter((val) => val !== "")
+              .map((val) => Number(val))
+          : [],
+           multiLineCols: this.multiLineCols
+          ? this.multiLineCols
+              .trim()
+              .split(";")
+              .filter((val) => val !== "")
+              .map((val) => Number(val))
+          : [],
         gridConfigVals: this.columnDefinitionValue
           ? this.columnDefinitionValue
               .trim()
@@ -292,6 +321,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
               .filter((val) => val !== "")
           : [],
         cellHighlight: this.cellHighlight ? JSON.parse(this.cellHighlight) : undefined,
+        cellsDisabled: this.cellsDisabled ? JSON.parse(this.cellsDisabled) : undefined,
         formulaConfig: this.formulaDefiniation ? JSON.parse(this.formulaDefiniation) : undefined,
         sumTotalColumns: this.sumTotalColumns
           .trim()

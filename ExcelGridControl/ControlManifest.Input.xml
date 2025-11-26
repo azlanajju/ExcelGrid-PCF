@@ -13,7 +13,10 @@
     <property name="columnDefinitionValue" display-name-key="Column-Dropdown-Value" description-key="Columns with drop down vlues ; saperated" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="dropDownDelay" display-name-key="Dropdown-Delay-ms" description-key="Delay to appear drop down window in mllisecs" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="selectedCell" display-name-key="Selected-Cell" description-key="Currently selcted cell" of-type="SingleLine.Text" usage="bound" required="false" />
-    <property name="cellHighlight" display-name-key="Cell-Highlight-Value" description-key="Cells with Highlighted borders in string of arrays" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="cellHighlight" display-name-key="Cell-Highlight-Value" description-key="Cells with Highlighted borders in string of array" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="cellsDisabled" display-name-key="Disabled-Cell-Value" description-key="Cells to be disabled in string of array" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="numberCols" display-name-key="NumberedColumns" description-key="Columns which are only numbers ; saperated" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="multiLineCols" display-name-key="MultiLinedColumns" description-key="Columns which are multilined ; saperated" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="ignoreValidationColumn" display-name-key="Columns to ignore validation" description-key="Columns to ignore add row validation" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="formulaDefiniation" display-name-key="Formula-Definition" description-key="Json definiation for defining formulas" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="tableEditable" display-name-key="Editable-Table" description-key="Boolean to set table is editable or not" of-type="TwoOptions" usage="bound" required="false" />

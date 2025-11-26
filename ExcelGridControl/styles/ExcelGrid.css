@@ -27,7 +27,8 @@
 .excel-title {
   color: #020617;
   margin: 0;
-  font-size: 24px;
+  /* font-size: 24px; */
+  font-size: 18px;
   font-weight: 700;
 }
 
@@ -150,7 +151,7 @@
 }
 
 .excel-cell.selected {
-  background-color: #dbeafe !important;
+  /* background-color: #dbeafe !important; */
   border-color: #3b82f6;
 }
 
@@ -945,7 +946,7 @@
 .excel-wrapper {
     background-color: #f8f8f8;
     box-shadow: none;
-    margin: 0;
+    margin: 0 0 0 -10px;
 }
  
 .excel-scroll-container {
@@ -961,27 +962,53 @@
  
 .excel-input {
     background-color: #dbeafe;
-    padding: 10px 20px 10px 12px;
-    text-align: left !important;
+    padding: 12px 20px 10px 12px;
+    text-align: left;
+  /* height: 44px !important; */
+    
 }
- 
+
+/* textarea.excel-input:focus {
+    height: 100% !important;
+}
+  */
+
+.excel-input-fixed-height {
+  height: 44px !important;
+}
+
 .excel-input:focus {
     background-color: #fff;
-    /* box-shadow: none; */
+    box-shadow: none;
 }
  
 .excel-input.header-input {
     padding: 12px 12px;
     background-color: #e2e8f0;
 }
- 
+
 .excel-input.header-input:focus {
     background-color: #e2e8f0 !important;
-    /* box-shadow: none; */
+    box-shadow: none;
 }
- 
+
 .dropdown-arrow {
-    top: 16px;
+    top: 45%;
     transform: none;
 }
- 
+.excel-scroll-container{
+  /* overflow-y: hidden;
+  overflow-x: auto; */
+  max-height: calc(100vh - 350px);
+}
+
+[data-pa-type="pa-items-container"]{
+  overflow: hidden;
+}
+
+
+.excel-input[type="number"]::-webkit-outer-spin-button,
+.excel-input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

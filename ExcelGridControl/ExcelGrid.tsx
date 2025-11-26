@@ -65,8 +65,8 @@ useEffect(() => {
   }, []);
 
   useEffect(() => {
-    console.log("cellHighlight", props.cellHighlight, data, props.ignoreValidationColumn);
-  }, [])
+    console.log("multiLineCols", props.multiLineCols,props.numberCols);
+  }, [props.multiLineCols,props.numberCols])
 
 
   const cellRefs = useRef<(HTMLTableCellElement | null)[][]>([]);
@@ -291,7 +291,6 @@ useEffect(() => {
     <div className="excel-wrapper" onKeyDown={handleKeyDown} tabIndex={0}>
       <div className="excel-header">
         <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
-          {/* <h3 className="excel-title">Excel Grid</h3> */}
           <div className="help-icon-container">
             <button className="help-icon-btn" title="Keyboard Shortcuts">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -308,6 +307,8 @@ useEffect(() => {
               <div className="help-item"><span className="help-key">Esc</span> <span>Close dropdown</span></div>
             </div>
           </div>
+          <h3 className="excel-title">Excel Grid</h3>
+
         </div>
         <Toolbar tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton}
           // addRow={() => setData((prev) => [...prev, new Array(prev[0].length).fill("")])} 
@@ -378,7 +379,9 @@ useEffect(() => {
           getFormula={(col) => getFormula(col, props.formulaConfig)} hasUpload={hasUpload} validateAndCorrectValue={validateAndCorrectValue}
           isCellEditable={isCellEditable} colWidths={colWidths} getFrozenLeft={getFrozenLeft} tableRef={tableRef}
           cellRefs={cellRefs} colRefs={colRefs} conversionConfig={props.conversionCols} onFileUpdload={props.onFileUpdload}
-          onFileView={props.onFileView} onCellDropDown={props.onCellDropDown} getCellAlignment={getCellAlignment} cellHighlight={props.cellHighlight} {...props} />
+          onFileView={props.onFileView} onCellDropDown={props.onCellDropDown} getCellAlignment={getCellAlignment} 
+          multiLineCols={props.multiLineCols} numberCols={props.numberCols} cellHighlight={props.cellHighlight}
+           cellsDisabled={props.cellsDisabled} {...props} />
 
         {activeDropdown && <DropdownMenu  activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection} dropDownDelay={props.dropDownDelay} />}
       </div>
