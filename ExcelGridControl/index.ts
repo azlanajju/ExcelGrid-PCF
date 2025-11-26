@@ -7,6 +7,7 @@ const constants = {
   gridData: [["Header1", "Header2", "Header3"]],
   currentKey: 0,
   frozenColumns: "",
+  title: "Excel Grid",
   sampleGrid: "",
   columnDefinition: "",
   numberCols: "",
@@ -61,6 +62,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
   private currentKey = 0;
 
   private frozenColumns = constants.frozenColumns;
+  private title = constants.title;
   private fileSetCells = constants.fileSetCells;
   private sampleGrid = constants.sampleGrid;
   private columnDefinition = constants.columnDefinition;
@@ -118,6 +120,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
   public updateView(context: ComponentFramework.Context<IInputs>): void {
     const prev = {
       frozenColumns: this.frozenColumns,
+      title: this.title,
       fileSetCells: this.fileSetCells, // ✅ track
       uploadingCell: this.uploadingCell,
       viewingCell: this.viewingCell,
@@ -164,6 +167,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
 
     if (
       prev.frozenColumns !== this.frozenColumns ||
+      prev.title !== this.title ||
       prev.fileSetCells !== this.fileSetCells || // ✅ check
       prev.uploadingCell !== this.uploadingCell ||
       prev.viewingCell !== this.viewingCell ||
@@ -239,6 +243,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
 
     // Inputs
     this.frozenColumns = this.getOrDefault(context.parameters.frozenColumns, constants.frozenColumns);
+    this.title = this.getOrDefault(context.parameters.title, constants.title);
     this.fileSetCells = this.getOrDefault(context.parameters.fileSetCells, constants.fileSetCells); // ✅ new
 
     this.uploadingCell = this.getOrDefault(context.parameters.uploadingCell, constants.uploadingCell);
@@ -337,6 +342,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
         showAddColumnButton: this.showAddColumnButton,
         frozenColumns: frozenColsArray,
         frozenColumnsString: this.frozenColumns,
+        title: this.title,
         fileSetCells: fileSetCellsArray,
         columnOrder: this.columnOrder,
         dropDownDelay: parseInt(this.dropDownDelay),

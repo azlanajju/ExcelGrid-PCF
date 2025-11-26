@@ -307,7 +307,7 @@ useEffect(() => {
               <div className="help-item"><span className="help-key">Esc</span> <span>Close dropdown</span></div>
             </div>
           </div>
-          <h3 className="excel-title">Excel Grid</h3>
+          <h3 className="excel-title">{props.title}</h3>
 
         </div>
         <Toolbar tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton}

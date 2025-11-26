@@ -9,6 +9,7 @@
     <property name="val1" display-name-key="val1" description-key="Input String for table in matrix format" of-type="Object" usage="bound" required="true" />
 
     <property name="columnDefinition" display-name-key="Column-Dropdown-Definition" description-key="Columns with drop downs ; saperated" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="title" display-name-key="Title" description-key="Title for component" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="columnDropdownSelected" display-name-key="Column-Dropdown-Selected" description-key="Currently selcted column" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="columnDefinitionValue" display-name-key="Column-Dropdown-Value" description-key="Columns with drop down vlues ; saperated" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="dropDownDelay" display-name-key="Dropdown-Delay-ms" description-key="Delay to appear drop down window in mllisecs" of-type="SingleLine.Text" usage="bound" required="false" />
