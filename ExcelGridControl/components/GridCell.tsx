@@ -315,7 +315,8 @@ else {
       onContextMenu={onContextMenu}
       onClick={(e) => {
         onClick(e);
-        // if (hasDropdown) onCellDropDown(id, headerVal, false, "Yes");
+        if (hasDropdown) onCellDropDown(id, headerVal, false, "No"); 
+        else onCellDropDown(id, headerVal, false, "Yes");
       }}
       ref={(el) => {
         colRefs.current[col] = el!;

@@ -6,6 +6,7 @@ import { IInputs, IOutputs } from "./generated/ManifestTypes";
 const constants = {
   gridData: [["Header1", "Header2", "Header3"]],
   currentKey: 0,
+  delayInput: 0,
   frozenColumns: "",
   title: "Excel Grid",
   sampleGrid: "",
@@ -65,6 +66,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
   private frozenColumns = constants.frozenColumns;
   private title = constants.title;
   private height = constants.height;
+  private delayInput = constants.delayInput;
   private fileSetCells = constants.fileSetCells;
   private sampleGrid = constants.sampleGrid;
   private columnDefinition = constants.columnDefinition;
@@ -110,6 +112,24 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
   private bodyBackgroundColor = constants.body.backgroundColor;
   private bodyBorderColor = constants.body.borderColor;
 
+
+
+  private debounceTimeout: any;
+
+private debounceNotifyOutput(data: string[][], frozenColumns: string, fileSetCells: string) {
+    clearTimeout(this.debounceTimeout);
+
+    this.debounceTimeout = setTimeout(() => {
+        this.sampleGrid = JSON.stringify(data);
+        this.frozenColumns = frozenColumns;
+        this.fileSetCells = fileSetCells;
+        this.notifyOutputChanged();
+    }, this.delayInput ? this.delayInput : 1500); // adjust 200-400ms based on feel
+}
+
+
+
+
   public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state: ComponentFramework.Dictionary, container: HTMLDivElement): void {
     this.container = container;
     this.notifyOutputChanged = notifyOutputChanged;
@@ -124,6 +144,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       frozenColumns: this.frozenColumns,
       title: this.title,
       height: this.height,
+      delayInput: this.delayInput,
       fileSetCells: this.fileSetCells, // ✅ track
       uploadingCell: this.uploadingCell,
       viewingCell: this.viewingCell,
@@ -172,6 +193,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       prev.frozenColumns !== this.frozenColumns ||
       prev.title !== this.title ||
       prev.height !== this.height ||
+      prev.delayInput !== this.delayInput ||
       prev.fileSetCells !== this.fileSetCells || // ✅ check
       prev.uploadingCell !== this.uploadingCell ||
       prev.viewingCell !== this.viewingCell ||
@@ -249,6 +271,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
     this.frozenColumns = this.getOrDefault(context.parameters.frozenColumns, constants.frozenColumns);
     this.title = this.getOrDefault(context.parameters.title, constants.title);
     this.height = this.getOrDefault(context.parameters.height, constants.height);
+    this.delayInput = context.parameters.delayInput.raw;
     this.fileSetCells = this.getOrDefault(context.parameters.fileSetCells, constants.fileSetCells); // ✅ new
 
     this.uploadingCell = this.getOrDefault(context.parameters.uploadingCell, constants.uploadingCell);
@@ -349,17 +372,22 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
         frozenColumnsString: this.frozenColumns,
         title: this.title,
         height: this.height,
+        delayInput: this.delayInput,
         fileSetCells: fileSetCellsArray,
         columnOrder: this.columnOrder,
         dropDownDelay: parseInt(this.dropDownDelay),
         selectedCell: this.selectedCell,
 
+        // onDataChange: (data: string[][], frozenColumns = "", fileSetCells = "") => {
+        //   this.sampleGrid = JSON.stringify(data);
+        //   this.frozenColumns = frozenColumns;
+        //   this.fileSetCells = fileSetCells; // ✅ keep updated
+        //   this.notifyOutputChanged();
+        // },
         onDataChange: (data: string[][], frozenColumns = "", fileSetCells = "") => {
-          this.sampleGrid = JSON.stringify(data);
-          this.frozenColumns = frozenColumns;
-          this.fileSetCells = fileSetCells; // ✅ keep updated
-          this.notifyOutputChanged();
-        },
+    this.debounceNotifyOutput(data, frozenColumns, fileSetCells);
+},
+
 
         onColumnOrderChange: (columnOrder: string) => {
           this.columnOrder = columnOrder;
