@@ -385,7 +385,11 @@ private debounceNotifyOutput(data: string[][], frozenColumns: string, fileSetCel
         //   this.notifyOutputChanged();
         // },
         onDataChange: (data: string[][], frozenColumns = "", fileSetCells = "") => {
-    this.debounceNotifyOutput(data, frozenColumns, fileSetCells);
+    // this.debounceNotifyOutput(data, frozenColumns, fileSetCells);
+     this.sampleGrid = JSON.stringify(data);
+        this.frozenColumns = frozenColumns;
+        this.fileSetCells = fileSetCells;
+        this.notifyOutputChanged();
 },
 
 
