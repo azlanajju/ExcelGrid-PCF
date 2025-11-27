@@ -38,11 +38,11 @@ export const useExcelData = (props: ExcelGridProps) => {
 
   const calculateDataWithTotals = useCallback(
     (data: Cell[][]) => {
-      console.log("columnsWithTotals before", columnsWithTotals);
+      // console.log("columnsWithTotals before", columnsWithTotals);
 
       if (data.length <= 1 || !columnsWithTotals || columnsWithTotals.length == 0) return data;
 
-      console.log("columnsWithTotals", columnsWithTotals);
+      // console.log("columnsWithTotals", columnsWithTotals);
 
       const dataWithoutTotals = data.filter((row, index) => index === 0 || row[0] !== "Total");
 
@@ -66,8 +66,7 @@ export const useExcelData = (props: ExcelGridProps) => {
 
       return [...dataWithoutTotals, totalsRow];
     },
-    [columnsWithTotals]
-  );
+    [columnsWithTotals]);
 
   const dataWithTotals = calculateDataWithTotals(data);
 

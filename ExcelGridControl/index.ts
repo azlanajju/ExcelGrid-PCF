@@ -9,6 +9,7 @@ const constants = {
   frozenColumns: "",
   title: "Excel Grid",
   sampleGrid: "",
+  height: "",
   columnDefinition: "",
   numberCols: "",
   multiLineCols: "",
@@ -63,6 +64,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
 
   private frozenColumns = constants.frozenColumns;
   private title = constants.title;
+  private height = constants.height;
   private fileSetCells = constants.fileSetCells;
   private sampleGrid = constants.sampleGrid;
   private columnDefinition = constants.columnDefinition;
@@ -121,6 +123,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
     const prev = {
       frozenColumns: this.frozenColumns,
       title: this.title,
+      height: this.height,
       fileSetCells: this.fileSetCells, // ✅ track
       uploadingCell: this.uploadingCell,
       viewingCell: this.viewingCell,
@@ -168,6 +171,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
     if (
       prev.frozenColumns !== this.frozenColumns ||
       prev.title !== this.title ||
+      prev.height !== this.height ||
       prev.fileSetCells !== this.fileSetCells || // ✅ check
       prev.uploadingCell !== this.uploadingCell ||
       prev.viewingCell !== this.viewingCell ||
@@ -220,7 +224,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
   }
 
   private updateGridProps(context: ComponentFramework.Context<IInputs>) {
-    console.log("ignore val", this.getOrDefault(context.parameters.ignoreValidationColumn, constants.ignoreValidationColumn),context.parameters);
+    // console.log("ignore val", this.getOrDefault(context.parameters.ignoreValidationColumn, constants.ignoreValidationColumn),context.parameters);
     
     // Header styles
     this.headerFontFamily = this.getOrDefault(context.parameters.headerFontFamily, constants.header.fontFamily);
@@ -244,6 +248,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
     // Inputs
     this.frozenColumns = this.getOrDefault(context.parameters.frozenColumns, constants.frozenColumns);
     this.title = this.getOrDefault(context.parameters.title, constants.title);
+    this.height = this.getOrDefault(context.parameters.height, constants.height);
     this.fileSetCells = this.getOrDefault(context.parameters.fileSetCells, constants.fileSetCells); // ✅ new
 
     this.uploadingCell = this.getOrDefault(context.parameters.uploadingCell, constants.uploadingCell);
@@ -343,6 +348,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
         frozenColumns: frozenColsArray,
         frozenColumnsString: this.frozenColumns,
         title: this.title,
+        height: this.height,
         fileSetCells: fileSetCellsArray,
         columnOrder: this.columnOrder,
         dropDownDelay: parseInt(this.dropDownDelay),

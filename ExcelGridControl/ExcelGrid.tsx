@@ -196,37 +196,54 @@ useEffect(() => {
     [hasDropdownOptions, getDropdownOptions, data, props.formulaConfig]
   );
 
+
   const handleInputFocus = useCallback(
-    (row: number, col: number) => {
-      setFocusedCell([row, col]);
-      if (row > 0 && hasDropdownOptions(col) && !hasFormula(col, props.formulaConfig)) {
-        const options = getDropdownOptions(col);
-        const currentValue = String(data[row][col] || "");
-        setActiveDropdown({
-          row,
-          col,
-          options,
-          filteredOptions: options,
-          inputValue: currentValue,
-        });
-      } else {
-        setActiveDropdown(null);
-      }
-    },
-    [hasDropdownOptions, getDropdownOptions, data, props.formulaConfig]
-  );
+  (row: number, col: number) => {
+    setFocusedCell([row, col]);
+    
+    if (row > 0 && hasDropdownOptions(col) && !hasFormula(col, props.formulaConfig)) {
+      const options = getDropdownOptions(col);
+      const currentValue = String(data[row][col] || "");
+      
+      setActiveDropdown({
+        row,
+        col,
+        options,
+        filteredOptions: options, // ✅ Show all options initially
+        inputValue: currentValue,
+      });
+    } else {
+      setActiveDropdown(null);
+    }
+  },
+  [hasDropdownOptions, getDropdownOptions, data, props.formulaConfig]
+);
 
   const handleChange = useCallback(
-    (row: number, col: number, value: string) => {
-      if (!isCellEditable(row, col)) return;
-      setData((prev) => {
-        const newData = prev.map((r) => [...r]);
-        newData[row][col] = value;
-        return updateFormulas(newData, props.formulaConfig);
+  (row: number, col: number, value: string) => {
+    if (!isCellEditable(row, col)) return;
+
+    setData((prev) => {
+      const newData = prev.map((r) => [...r]);
+       newData[row][col] = value;
+      return updateFormulas(newData, props.formulaConfig);
+    });
+
+    // ✅ ADD THIS: Filter dropdown options based on input
+    if (activeDropdown && activeDropdown.row === row && activeDropdown.col === col) {
+      const filtered = activeDropdown.options.filter((opt) =>
+        opt.toLowerCase().includes(value.toLowerCase())
+      );
+      
+      setActiveDropdown({
+        ...activeDropdown,
+        inputValue: value,
+        filteredOptions: filtered.length > 0 ? filtered : activeDropdown.options,
       });
-    },
-    [isCellEditable, props.formulaConfig, setData, updateFormulas]
-  );
+    }
+  },
+  [isCellEditable, props.formulaConfig, setData, updateFormulas, activeDropdown]
+);
 
   const validateAndCorrectValue = useCallback(
     (row: number, col: number) => {
@@ -369,7 +386,8 @@ useEffect(() => {
           }} getDropdownOptions={getDropdownOptions} />
       </div>
 
-      <div className="excel-scroll-container" onScroll={handleScroll}>
+      <div className="excel-scroll-container" onScroll={handleScroll} 
+      style={{maxHeight:props.height ? `${props.height}px` : 'max-height: calc(100vh - 350px)'}} >
         <GridTable data={dataWithTotals} selection={selection} focusedCell={focusedCell} frozenCols={localFrozenColumns}
           fileSetCells={localFileSetCells} configData={configData} tableEditable={props.tableEditable}
           headerStyle={props.headerStyle} bodyStyle={props.bodyStyle} onCellClick={handleCellClick}
@@ -383,7 +401,7 @@ useEffect(() => {
           multiLineCols={props.multiLineCols} numberCols={props.numberCols} cellHighlight={props.cellHighlight}
            cellsDisabled={props.cellsDisabled} {...props} />
 
-        {activeDropdown && <DropdownMenu  activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection} dropDownDelay={props.dropDownDelay} />}
+        {activeDropdown && <DropdownMenu dropDownDelay={props.dropDownDelay} activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection} />}
       </div>
 
       {contextMenu && (

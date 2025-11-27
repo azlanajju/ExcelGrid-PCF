@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { invisibleChar } from "../constants";
 
 interface GridCellProps {
   value: string | number;
@@ -46,7 +47,17 @@ export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selecte
   const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null);
   const [isUsing, setIsUsing] = useState(false);
 
-
+useEffect(() => {
+  if(!focused && hasDropdown) {
+    if (`${value}`.endsWith(invisibleChar)) {
+    onChange(`${value}`.slice(0, -1))
+}
+else {
+  onChange("")
+}
+  }
+  
+},[focused,hasDropdown])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -304,8 +315,7 @@ export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selecte
       onContextMenu={onContextMenu}
       onClick={(e) => {
         onClick(e);
-        if (hasDropdown) onCellDropDown(id, headerVal);
-        onCellDropDown(id, headerVal, false, "Yes");
+        // if (hasDropdown) onCellDropDown(id, headerVal, false, "Yes");
       }}
       ref={(el) => {
         colRefs.current[col] = el!;

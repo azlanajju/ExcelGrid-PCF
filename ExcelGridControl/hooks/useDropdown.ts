@@ -16,7 +16,7 @@ export const useDropdown = (
       const { row, col } = activeDropdown;
       setData(prev => {
         const newData = prev.map(r => [...r]);
-        newData[row][col] = option;
+        newData[row][col] = `${option}\u200B`;
         return newData;
       });
       setActiveDropdown(null);

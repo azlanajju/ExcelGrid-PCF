@@ -12,6 +12,8 @@ export const useSelection = () => {
 
     setSelection({ start: [row, col], end: [row, col] });
     setFocusedCell([row, col]);
+    
+    
   };
 
   const endSelection = () => {

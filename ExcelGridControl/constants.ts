@@ -27,3 +27,6 @@ export const constants = {
     borderColor: "#e2e8f0",
   }
 };
+
+
+export const invisibleChar = "\u200B"
