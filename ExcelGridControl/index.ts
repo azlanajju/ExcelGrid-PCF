@@ -6,7 +6,7 @@ import { IInputs, IOutputs } from "./generated/ManifestTypes";
 const constants = {
   gridData: [["Header1", "Header2", "Header3"]],
   currentKey: 0,
-  delayInput: 0,
+  resetConfig: "{}",
   frozenColumns: "",
   title: "Excel Grid",
   sampleGrid: "",
@@ -66,7 +66,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
   private frozenColumns = constants.frozenColumns;
   private title = constants.title;
   private height = constants.height;
-  private delayInput = constants.delayInput;
+  private resetConfig = constants.resetConfig;
   private fileSetCells = constants.fileSetCells;
   private sampleGrid = constants.sampleGrid;
   private columnDefinition = constants.columnDefinition;
@@ -89,7 +89,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
 
   private uploadingCell: string = "";
   private viewingCell: string = "";
-  private dropDownDelay:string = "100";
+  private dropDownDelay: string = "100";
   columnDropdownSelected: string = "";
   selectedCell: string = "";
 
@@ -114,19 +114,6 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
 
 
 
-  private debounceTimeout: any;
-
-private debounceNotifyOutput(data: string[][], frozenColumns: string, fileSetCells: string) {
-    clearTimeout(this.debounceTimeout);
-
-    this.debounceTimeout = setTimeout(() => {
-        this.sampleGrid = JSON.stringify(data);
-        this.frozenColumns = frozenColumns;
-        this.fileSetCells = fileSetCells;
-        this.notifyOutputChanged();
-    }, this.delayInput ? this.delayInput : 3000); // adjust 200-400ms based on feel
-}
-
 
 
 
@@ -144,7 +131,7 @@ private debounceNotifyOutput(data: string[][], frozenColumns: string, fileSetCel
       frozenColumns: this.frozenColumns,
       title: this.title,
       height: this.height,
-      delayInput: this.delayInput,
+      resetConfig: this.resetConfig,
       fileSetCells: this.fileSetCells, // ✅ track
       uploadingCell: this.uploadingCell,
       viewingCell: this.viewingCell,
@@ -193,7 +180,7 @@ private debounceNotifyOutput(data: string[][], frozenColumns: string, fileSetCel
       prev.frozenColumns !== this.frozenColumns ||
       prev.title !== this.title ||
       prev.height !== this.height ||
-      prev.delayInput !== this.delayInput ||
+      prev.resetConfig !== this.resetConfig ||
       prev.fileSetCells !== this.fileSetCells || // ✅ check
       prev.uploadingCell !== this.uploadingCell ||
       prev.viewingCell !== this.viewingCell ||
@@ -247,7 +234,8 @@ private debounceNotifyOutput(data: string[][], frozenColumns: string, fileSetCel
 
   private updateGridProps(context: ComponentFramework.Context<IInputs>) {
     // console.log("ignore val", this.getOrDefault(context.parameters.ignoreValidationColumn, constants.ignoreValidationColumn),context.parameters);
-    
+// console.log("context.parameters.resetConfig",context.parameters.resetConfig);
+
     // Header styles
     this.headerFontFamily = this.getOrDefault(context.parameters.headerFontFamily, constants.header.fontFamily);
     this.headerFontSize = this.getOrDefault(context.parameters.headerFontSize, constants.header.fontSize);
@@ -271,8 +259,10 @@ private debounceNotifyOutput(data: string[][], frozenColumns: string, fileSetCel
     this.frozenColumns = this.getOrDefault(context.parameters.frozenColumns, constants.frozenColumns);
     this.title = this.getOrDefault(context.parameters.title, constants.title);
     this.height = this.getOrDefault(context.parameters.height, constants.height);
-    this.delayInput = context.parameters.delayInput.raw;
+    this.resetConfig = this.getOrDefault(context.parameters.resetConfig, constants.resetConfig);
     this.fileSetCells = this.getOrDefault(context.parameters.fileSetCells, constants.fileSetCells); // ✅ new
+
+    
 
     this.uploadingCell = this.getOrDefault(context.parameters.uploadingCell, constants.uploadingCell);
     this.viewingCell = this.getOrDefault(context.parameters.viewingCell, constants.viewingCell);
@@ -320,38 +310,39 @@ private debounceNotifyOutput(data: string[][], frozenColumns: string, fileSetCel
     this.root.render(
       React.createElement(ExcelGrid, {
         inputGrid: this.sampleGrid,
+        resetConfig: this.resetConfig ? JSON.parse(this.resetConfig) : {} ,
         gridConfig: this.columnDefinition
           ? this.columnDefinition
-              .trim()
-              .split(";")
-              .filter((val) => val !== "")
-              .map((val) => Number(val))
+            .trim()
+            .split(";")
+            .filter((val) => val !== "")
+            .map((val) => Number(val))
           : [],
-           numberCols: this.numberCols
+        numberCols: this.numberCols
           ? this.numberCols
-              .trim()
-              .split(";")
-              .filter((val) => val !== "")
-              .map((val) => Number(val))
+            .trim()
+            .split(";")
+            .filter((val) => val !== "")
+            .map((val) => Number(val))
           : [],
-           multiLineCols: this.multiLineCols
+        multiLineCols: this.multiLineCols
           ? this.multiLineCols
-              .trim()
-              .split(";")
-              .filter((val) => val !== "")
-              .map((val) => Number(val))
+            .trim()
+            .split(";")
+            .filter((val) => val !== "")
+            .map((val) => Number(val))
           : [],
         gridConfigVals: this.columnDefinitionValue
           ? this.columnDefinitionValue
-              .trim()
-              .split(";")
-              .filter((val) => val !== "")
+            .trim()
+            .split(";")
+            .filter((val) => val !== "")
           : [],
-          ignoreValidationColumn: this.ignoreValidationColumn
+        ignoreValidationColumn: this.ignoreValidationColumn
           ? this.ignoreValidationColumn
-              .trim()
-              .split(";")
-              .filter((val) => val !== "")
+            .trim()
+            .split(";")
+            .filter((val) => val !== "")
           : [],
         cellHighlight: this.cellHighlight ? JSON.parse(this.cellHighlight) : undefined,
         cellsDisabled: this.cellsDisabled ? JSON.parse(this.cellsDisabled) : undefined,
@@ -372,7 +363,6 @@ private debounceNotifyOutput(data: string[][], frozenColumns: string, fileSetCel
         frozenColumnsString: this.frozenColumns,
         title: this.title,
         height: this.height,
-        delayInput: this.delayInput,
         fileSetCells: fileSetCellsArray,
         columnOrder: this.columnOrder,
         dropDownDelay: parseInt(this.dropDownDelay),
@@ -385,12 +375,12 @@ private debounceNotifyOutput(data: string[][], frozenColumns: string, fileSetCel
         //   this.notifyOutputChanged();
         // },
         onDataChange: (data: string[][], frozenColumns = "", fileSetCells = "") => {
-    // this.debounceNotifyOutput(data, frozenColumns, fileSetCells);
-     this.sampleGrid = JSON.stringify(data);
-        this.frozenColumns = frozenColumns;
-        this.fileSetCells = fileSetCells;
-        this.notifyOutputChanged();
-},
+          // this.debounceNotifyOutput(data, frozenColumns, fileSetCells);
+          this.sampleGrid = JSON.stringify(data);
+          this.frozenColumns = frozenColumns;
+          this.fileSetCells = fileSetCells;
+          this.notifyOutputChanged();
+        },
 
 
         onColumnOrderChange: (columnOrder: string) => {
@@ -408,7 +398,7 @@ private debounceNotifyOutput(data: string[][], frozenColumns: string, fileSetCel
           this.notifyOutputChanged();
         },
 
-        onCellDropDown: (row: string, col: string, isReset = false,isCell="No") => {
+        onCellDropDown: (row: string, col: string, isReset = false, isCell = "No") => {
           if (!isReset) {
             if (isCell == "No") this.columnDropdownSelected = `${col};${row}`;
             this.selectedCell = `${col};${row}`;

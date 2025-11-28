@@ -8,6 +8,10 @@ export interface FormulaConfig {
   [columnIndex: number]: string;
 }
 
+export interface ResetConfig {
+  [columnIndex: string]: string;
+}
+
 export interface UploadConfig {
   [columnIndex: number]: string;
 }
@@ -19,7 +23,6 @@ export interface ConversionConfig {
 export interface ExcelGridProps {
   title: string;
   height: string;
-  delayInput: number;
   onDataChange: (data: Cell[][], frozenColumns?: string) => void;
   onColumnOrderChange: (columnOrder: string) => void;
   onFileUpdload: (row: string, col: string) => void;
@@ -27,6 +30,7 @@ export interface ExcelGridProps {
   onFileView: (row: string, col: string, currVal: string) => void;
   inputGrid?: Cell[][] | string;
   gridConfig?: number[];
+  resetConfig : any;
   multiLineCols?: number[];
   numberCols?: number[];
   gridConfigVals?: string[];

@@ -24,7 +24,10 @@ import { isValidDropdownValue } from "./utils/validation";
 
 export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
   const { data, setData, rowIds, dataWithTotals, configData, columnsWithTotals, setColumnsWithTotals } = useExcelData(props);
-
+useEffect(() => {
+  console.log("props.resetConfig",props.resetConfig);
+  
+},[props.resetConfig])
   const { selection, focusedCell, setSelection, setFocusedCell, startSelection, extendSelection, endSelection, getSelectedRange } = useSelection();
 
  const [visible, setVisible] = useState(false); 

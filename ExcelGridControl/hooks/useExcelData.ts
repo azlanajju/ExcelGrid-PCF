@@ -8,12 +8,57 @@ export const useExcelData = (props: ExcelGridProps) => {
     ["Header1", "Header2", "Header3"],
     ["", "", ""],
   ]);
+  const [prevData, setPrevData] = useState<Cell[][]>([]);
   const [configData, setConfigData] = useState<any>([]);
   // const [frozenCols, setFrozenCols] = useState<number[]>(props.frozenColumns || []);
   const [columnsWithTotals, setColumnsWithTotals] = useState<number[]>([]);
 
   const [rowIds, setRowIds] = useState<Record<number, string>>({});
   const [columnOrderMap, setColumnOrderMap] = useState<number[] | null>(null);
+
+  useEffect(() => {
+  if (!props.resetConfig || !prevData.length) {
+    setPrevData(data);
+    return;
+  }
+
+  const resetRules = props.resetConfig; // example: { "1": ["2"] }
+  let updated = false;
+
+  const newData = data.map((row, rowIndex) => {
+    if (rowIndex === 0) return row; // skip headers
+
+    let updatedRow = [...row];
+
+    Object.entries(resetRules).forEach(([sourceCol, dependentCols]:any) => {
+      const sc = Number(sourceCol);
+      const deps = dependentCols.map(Number);
+
+      const prevValue = prevData[rowIndex]?.[sc];
+      const currentValue = row[sc];
+
+      // Trigger only if value changed
+      if (prevValue !== currentValue) {
+        deps.forEach((colIdx) => {
+          if (updatedRow[colIdx] !== "") {
+            updatedRow[colIdx] = "";
+            updated = true;
+          }
+        });
+      }
+    });
+
+    return updatedRow;
+  });
+
+  if (updated) {
+    setData(newData);
+  }
+
+  setPrevData(data);
+}, [data, props.resetConfig]);
+
+
 
   useEffect(() => {
     setConfigData(props.gridConfig ?? {});
