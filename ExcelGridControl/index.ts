@@ -124,7 +124,7 @@ private debounceNotifyOutput(data: string[][], frozenColumns: string, fileSetCel
         this.frozenColumns = frozenColumns;
         this.fileSetCells = fileSetCells;
         this.notifyOutputChanged();
-    }, this.delayInput ? this.delayInput : 1500); // adjust 200-400ms based on feel
+    }, this.delayInput ? this.delayInput : 3000); // adjust 200-400ms based on feel
 }
 
 

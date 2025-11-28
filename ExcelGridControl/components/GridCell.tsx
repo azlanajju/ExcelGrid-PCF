@@ -177,6 +177,7 @@ else {
     <input
       ref={inputRef as React.RefObject<HTMLInputElement>}
       value={String(value)}
+      // onChange={(e) => onChange(e.target.value)}
       onChange={(e) => onChange(e.target.value)}
       onFocus={onFocus}
       onBlur={onBlur}
@@ -197,58 +198,79 @@ else {
     />
   );
 
-  const renderNormalInput = () => {
-    if (isNumber) {
-      return (
-        <input
-          type="number"
-          ref={inputRef as React.RefObject<HTMLInputElement>}
-          value={String(value)}
-          onChange={(e) => onChange(e.target.value)}
-          onFocus={onFocus}
-          onBlur={onBlur}
-          readOnly={!isEditable || isTotalRow}
-          className={`excel-input ${selected ? "selected" : ""} ${frozen ? "frozen" : ""}`}
-          style={{
-            ...cellStyle,
-            width: "100%",
-            height: "100%",
-            border: "none",
-            background: "transparent",
-            textAlign: "right",
-            appearance: "none",
-            MozAppearance: "textfield",
-            padding: "6px 20px 10px 12px"
-          }}
-        />
-      );
-    }
+  const [localValue, setLocalValue] = useState(String(value));
 
+// keep sync when external value updates
+useEffect(() => {
+  setLocalValue(String(value));
+}, [value]);
+
+const handleBlur = () => {
+  if (!hasDropdown && localValue !== value) {
+    onChange(localValue);
+  }
+  onBlur();
+};
+
+const renderNormalInput = () => {
+  if (isNumber) {
     return (
-      <textarea
-        ref={inputRef as React.RefObject<HTMLTextAreaElement>}
-        value={String(value)}
-        onChange={(e) => onChange(e.target.value)}
+      <input
+        type="number"
+        ref={inputRef as React.RefObject<HTMLInputElement>}
+        value={localValue}
+        onChange={(e) => {
+          if (hasDropdown) onChange(e.target.value);
+          setLocalValue(e.target.value);
+        }}
         onFocus={onFocus}
-        onBlur={onBlur}
+        onBlur={handleBlur}
         readOnly={!isEditable || isTotalRow}
-        className={`excel-input ${isMultiLineInput ? '' : 'excel-input-fixed-height'} ${selected ? "selected" : ""} ${frozen ? "frozen" : ""} ${hasDropdown ? "dropdown-input" : ""} ${isFormula ? "formula-input" : ""}`}
+        className={`excel-input ${selected ? "selected" : ""} ${frozen ? "frozen" : ""}`}
         style={{
-          boxShadow: isHighlighted ? "inset 0 0 0px 3px #dd0000e5" : "",
           ...cellStyle,
           width: "100%",
-          resize: "none",
           height: "100%",
-          position: "relative",
-          zIndex: selected || focused ? 10 : frozen ? 20 : 0,
-          left: "0px",
-          textAlign: "left",
           border: "none",
           background: "transparent",
+          textAlign: "right",
+          appearance: "none",
+          MozAppearance: "textfield",
+          padding: "6px 20px 10px 12px"
         }}
       />
     );
-  };
+  }
+
+  return (
+    <textarea
+      ref={inputRef as React.RefObject<HTMLTextAreaElement>}
+      value={localValue}
+      onChange={(e) => {
+        if (hasDropdown) onChange(e.target.value);
+        setLocalValue(e.target.value);
+      }}
+      onFocus={onFocus}
+      onBlur={handleBlur}
+      readOnly={!isEditable || isTotalRow}
+      className={`excel-input ${isMultiLineInput ? '' : 'excel-input-fixed-height'} ${selected ? "selected" : ""} ${frozen ? "frozen" : ""} ${hasDropdown ? "dropdown-input" : ""} ${isFormula ? "formula-input" : ""}`}
+      style={{
+        boxShadow: isHighlighted ? "inset 0 0 0px 3px #dd0000e5" : "",
+        ...cellStyle,
+        width: "100%",
+        resize: "none",
+        height: "100%",
+        position: "relative",
+        zIndex: selected || focused ? 10 : frozen ? 20 : 0,
+        left: "0px",
+        textAlign: "left",
+        border: "none",
+        background: "transparent",
+      }}
+    />
+  );
+};
+
 
 
   const renderUploadSection = () => (
