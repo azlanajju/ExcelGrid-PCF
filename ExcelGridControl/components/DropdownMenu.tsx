@@ -30,9 +30,11 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
 
   // Controls fade-in, but dropdown mounts instantly (no flicker)
   const [visible, setVisible] = useState(false);
+    const [loading, setLoading] = useState(false);
+  
 
   useEffect(() => {
-    if (!tableRef.current || !activeDropdown) return;
+    if (!tableRef.current || !activeDropdown || position.top== 0 || position.left== 0) return;
 
     // console.log("position",position);
     
@@ -78,11 +80,12 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
     // Make it appear smoothly after layout calc
     // requestAnimationFrame(() => setVisible(true));
 
+    setLoading(true)
     
     const timer = setTimeout(() => setVisible(true), dropDownDelay);
     return () => clearTimeout(timer);
 
-  }, [ activeDropdown.row,activeDropdown.col, tableRef]);
+  }, [ activeDropdown,activeDropdown.filteredOptions.length, tableRef, position]);
 
   // Auto-close on scroll/resize
   useEffect(() => {
@@ -105,8 +108,29 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
     };
   }, [activeDropdown, setActiveDropdown]);
 
-  // Don't render until necessary
-  if (!activeDropdown || !tableEditable || !adjustedPosition) return null;
+  if (!activeDropdown || !tableEditable || !adjustedPosition || !visible) {
+      return loading ? <div
+      className="dropdown-menu"
+      style={{
+        position: "fixed",
+        top: `${adjustedPosition.top}px`,
+        left: `${adjustedPosition.left}px`,
+        width: `${adjustedPosition.width}px`,
+        maxHeight: activeDropdown.filteredOptions.length===1 ? '40vh' : `${adjustedPosition.maxHeight}px`,
+        overflowY: "auto",
+        zIndex: 1001,
+      }}
+      onClick={(e) => e.stopPropagation()}
+    >
+         <div className="dropdown-loader" >
+          <div className="spinner" />
+          <span>Loading options...</span>
+        </div>
+        </div> : 
+        null
+
+  }
+
 
   return (
     <div
@@ -125,7 +149,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      {activeDropdown.filteredOptions.length > 0 && visible ? (
+      {activeDropdown.filteredOptions.length > 0 ? (
         activeDropdown.filteredOptions.map((option, idx) => (
           <div
             key={idx}

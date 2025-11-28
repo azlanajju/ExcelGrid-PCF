@@ -12,6 +12,7 @@ interface GridTableProps {
   multiLineCols: number[];
   configData: any;
   tableEditable: boolean;
+  checkDropDown: (stringVal:string) => boolean;
   headerStyle: any;
   bodyStyle: any;
   onCellClick: (row: number, col: number, e: React.MouseEvent) => void;
@@ -43,7 +44,7 @@ interface GridTableProps {
   cellsDisabled: string[];
 }
 
-export const GridTable: React.FC<GridTableProps> = ({ data, selection, focusedCell, frozenCols, fileSetCells,numberCols,multiLineCols, configData, tableEditable, headerStyle, bodyStyle, onCellClick, onCellChange, onCellFocus, onContextMenu, onMouseDown, onMouseUp, onMouseOver, startResize, hasDropdownOptions, hasFormula, hasUpload, getFormula, validateAndCorrectValue, isCellEditable, colWidths, getFrozenLeft, tableRef, colRefs, cellRefs, conversionConfig, onFileUpdload, onFileView, onCellDropDown, rowIds, getCellAlignment, cellHighlight,cellsDisabled,  ...props }) => {
+export const GridTable: React.FC<GridTableProps> = ({ data, selection, focusedCell, frozenCols, fileSetCells,numberCols,multiLineCols, configData, tableEditable, headerStyle, bodyStyle, onCellClick, onCellChange, onCellFocus, onContextMenu, onMouseDown, onMouseUp, onMouseOver, startResize, hasDropdownOptions, hasFormula, hasUpload, getFormula, validateAndCorrectValue, isCellEditable, colWidths, getFrozenLeft, tableRef, colRefs, cellRefs, conversionConfig, onFileUpdload, onFileView, onCellDropDown, rowIds, getCellAlignment, cellHighlight,cellsDisabled,checkDropDown,  ...props }) => {
   const getSelectedRange = () => {
     if (!selection) return null;
     const [r1, c1] = selection.start;
@@ -94,7 +95,8 @@ export const GridTable: React.FC<GridTableProps> = ({ data, selection, focusedCe
                 startResize={startResize} formula={isFormula ? getFormula(cIdx) : undefined} 
                 frozenLeft={frozenCols.includes(cIdx) ? getFrozenLeft(cIdx) : 0} colRefs={colRefs} cellRefs={cellRefs} 
                 tableRef={tableRef} onFileUpdload={onFileUpdload} onFileView={onFileView} headerVal={headerVal} 
-                isHighlighted={highlighted} disabled={disabled} isMultiLineInput={multiLineCols.includes(cIdx)} isNumber={numberCols.includes(cIdx)} {...props} />;
+                isHighlighted={highlighted} disabled={disabled} isMultiLineInput={multiLineCols.includes(cIdx)} isNumber={numberCols.includes(cIdx)}
+                checkDropDown={checkDropDown} {...props} />;
               })} 
             </tr>
           );

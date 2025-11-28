@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Cell, DropdownState } from '../types';
 import { filterOptions } from '../utils/validation';
+import { invisibleChar } from '../constants';
 
 export const useDropdown = (
   data: Cell[][], 
@@ -16,7 +17,7 @@ export const useDropdown = (
       const { row, col } = activeDropdown;
       setData(prev => {
         const newData = prev.map(r => [...r]);
-        newData[row][col] = `${option}\u200B`;
+        newData[row][col] = `${option}`;
         return newData;
       });
       setActiveDropdown(null);

@@ -21,6 +21,7 @@ interface GridCellProps {
   onMouseDown: () => void;
   onMouseUp: () => void;
   onMouseOver: () => void;
+  checkDropDown: (stringVal:string) => boolean;
   onCellDropDown: (row: string, col: string, isReset?: boolean, isCell?: string) => void;
   onContextMenu: (e: React.MouseEvent) => void;
   onClick: (e: React.MouseEvent) => void;
@@ -43,21 +44,9 @@ interface GridCellProps {
   isNumber?: boolean;
 }
 
-export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selected, focused, frozen, fileSetCell, hasDropdown, hasUpload, isFormula, isEditable, isTotalRow, headerStyle, bodyStyle, textAlign = "center", onMouseDown, onMouseOver, onMouseUp, onContextMenu, onClick, onChange, onFocus, onBlur, startResize, frozenLeft, colRefs, cellRefs, tableRef, onFileUpdload, onFileView, headerVal, onCellDropDown, isHighlighted, disabled, isMultiLineInput = false, isNumber = false }) => {
+export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selected, focused, frozen, fileSetCell, hasDropdown, hasUpload, isFormula, isEditable, isTotalRow, headerStyle, bodyStyle, textAlign = "center", onMouseDown, onMouseOver, onMouseUp, onContextMenu, onClick, onChange, onFocus, onBlur, startResize, frozenLeft, colRefs, cellRefs, tableRef, onFileUpdload, onFileView, headerVal, onCellDropDown, isHighlighted, disabled, isMultiLineInput = false, isNumber = false,checkDropDown }) => {
   const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null);
   const [isUsing, setIsUsing] = useState(false);
-
-useEffect(() => {
-  if(!focused && hasDropdown) {
-    if (`${value}`.endsWith(invisibleChar)) {
-    onChange(`${value}`.slice(0, -1))
-}
-else {
-  onChange("")
-}
-  }
-  
-},[focused,hasDropdown])
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -206,6 +195,15 @@ useEffect(() => {
 }, [value]);
 
 const handleBlur = () => {
+  if(!focused && hasDropdown) {
+    if (checkDropDown(`${value}`)) {
+    onChange(`${value}`)
+}
+else {
+  onChange("")
+}
+  }
+  
   if (!hasDropdown && localValue !== value) {
     onChange(localValue);
   }

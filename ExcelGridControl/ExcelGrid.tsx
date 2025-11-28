@@ -1,6 +1,7 @@
 import isEqual from "lodash.isequal";
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ContextMenu } from "./components/ContextMenu";
+// import { DropdownMenu } from "./components/DropdownMenu copy";
 import { DropdownMenu } from "./components/DropdownMenu";
 import { Footer } from "./components/Footer";
 import { GridTable } from "./components/GridTable";
@@ -26,7 +27,7 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
 
   const { selection, focusedCell, setSelection, setFocusedCell, startSelection, extendSelection, endSelection, getSelectedRange } = useSelection();
 
-
+ const [visible, setVisible] = useState(false); 
 
   const { columnWidths, rowHeights, startResize, colRefs, colWidths, setColWidths, tableRef } = useResize(data);
 
@@ -47,16 +48,6 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
     return () => clearTimeout(timer);
   }, [toast]);
 
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-
-useEffect(() => {
-  const handleMove = (e: MouseEvent) => {
-    setMousePos({ x: e.clientX, y: e.clientY });
-  };
-
-  window.addEventListener("mousemove", handleMove);
-  return () => window.removeEventListener("mousemove", handleMove);
-}, []);
 
 
 
@@ -124,11 +115,19 @@ useEffect(() => {
   );
 
   const getDropdownOptions = useCallback(
-    (col: number): string[] => {
+    (col?: number): string[] => {
       return props.gridConfigVals || [];
     },
     [props.gridConfigVals]
   );
+
+  const checkDropDown = (stringVal : string) => {
+    if(props.gridConfigVals.length==0) return true
+  
+    return props.gridConfigVals.includes(stringVal)
+  }
+
+
 
   const isCellEditable = useCallback(
     (row: number, col: number): boolean => {
@@ -399,9 +398,9 @@ useEffect(() => {
           cellRefs={cellRefs} colRefs={colRefs} conversionConfig={props.conversionCols} onFileUpdload={props.onFileUpdload}
           onFileView={props.onFileView} onCellDropDown={props.onCellDropDown} getCellAlignment={getCellAlignment} 
           multiLineCols={props.multiLineCols} numberCols={props.numberCols} cellHighlight={props.cellHighlight}
-           cellsDisabled={props.cellsDisabled} {...props} />
+           cellsDisabled={props.cellsDisabled} checkDropDown={checkDropDown} {...props} />
 
-        {activeDropdown && <DropdownMenu dropDownDelay={props.dropDownDelay} activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection} />}
+        {activeDropdown && <DropdownMenu dropDownDelay={props.dropDownDelay} activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection}  />}
       </div>
 
       {contextMenu && (

@@ -1,3 +1,4 @@
+import { invisibleChar } from '../constants';
 import { Cell } from '../types';
 
 export function jsonTo2DArray<T extends Record<string, any>>(data: T[]): string[][] {
@@ -24,6 +25,11 @@ export function twoDArrayToJson<T = Record<Cell, Cell>>(data: Cell[][]): T[] {
         key = key + (i + 1);
       }
       obj[key] = row[i] ?? "";
+
+      // obj[key] = typeof row[i] === "string" && row[i].includes(invisibleChar)
+      //   ? row[i].replace(invisibleChar, "").trim()
+      //   : row[i]
+       
       return obj;
     }, {} as T)
   );
