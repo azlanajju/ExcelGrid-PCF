@@ -13,9 +13,12 @@ interface UseKeyboardProps {
   hasDropdownOptions: (col: number) => boolean;
   updateFormulas: (data: Cell[][]) => Cell[][];
   getDropdownOptions: (col: number) => string[];
+  setToast: React.Dispatch<React.SetStateAction<string>>;
+  ignoreValidationColumn?: string[];
+  noValidaton: boolean;
 }
 
-export const useKeyboard = ({ data, setData, selection, focusedCell, setFocusedCell, setSelection, isCellEditable, hasFormula, hasDropdownOptions, updateFormulas, getDropdownOptions }: UseKeyboardProps) => {
+export const useKeyboard = ({ data, setData, selection, focusedCell, setFocusedCell, setSelection, isCellEditable, hasFormula, hasDropdownOptions, updateFormulas, getDropdownOptions, setToast,ignoreValidationColumn,noValidaton }: UseKeyboardProps) => {
   const { clipboard, copyFromSystemClipboard, copySelection, cutSelection, pasteData } = useClipboard();
 
   const getSelectedRange = () => {
@@ -73,20 +76,48 @@ export const useKeyboard = ({ data, setData, selection, focusedCell, setFocusedC
           // If we're at the end, add a new row
           if (nextRow >= data.length) {
             setData((prev) => {
-              if (prev.length === 0) return prev;
+              // If no rows or only header, normal append logic
+              if (prev.length <= 1) {
+                return prev.concat([new Array(prev[0].length).fill("")]);
+              }
 
+              const headerRow = prev[0];
               const lastRow = prev[prev.length - 1];
               const colCount = lastRow.length;
 
-              // Create a new empty row with same number of columns
+              // ---- Validation ----
+              let isAnyEmpty = false;
+              for (let i = 0; i < lastRow.length; i++) {
+                const header = headerRow[i];
+
+                // Skip validation if column ignored
+                if (ignoreValidationColumn.includes(`${header}`)) continue;
+
+                // Validate cell
+                if (lastRow[i] === "" || lastRow[i] == null) {
+                  isAnyEmpty = true;
+                  break;
+                }
+              }
+
+              if (isAnyEmpty && !noValidaton) {
+                setToast("Please fill all required cells before adding a new row.");
+                return prev;
+              }
+
+              // ---- Insert Row (before last row) ----
               const emptyRow = Array(colCount).fill("");
 
               setFocusedCell([nextRow, nextCol]);
               setSelection({ start: [nextRow, nextCol], end: [nextRow, nextCol] });
 
-              // Return: [all rows except last, empty row, last row]
-              return [...prev.slice(0, -1), emptyRow, lastRow];
+              return [
+                ...prev.slice(0, -1),  // everything except last
+                lastRow,                // shift old last row
+                emptyRow,              // new blank row
+              ];
             });
+
             return;
           }
         }

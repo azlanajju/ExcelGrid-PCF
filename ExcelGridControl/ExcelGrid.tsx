@@ -160,6 +160,9 @@ useEffect(() => {
     hasDropdownOptions,
     getDropdownOptions,
     updateFormulas: (newData) => updateFormulas(newData, props.formulaConfig),
+    setToast: setToast,
+    noValidaton: props.noValidaton,
+    ignoreValidationColumn: props.ignoreValidationColumn
   });
 
   useClipboard();
