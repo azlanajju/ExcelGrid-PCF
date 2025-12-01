@@ -227,6 +227,7 @@ const renderNormalInput = () => {
         className={`excel-input ${selected ? "selected" : ""} ${frozen ? "frozen" : ""}`}
         style={{
           ...cellStyle,
+          boxShadow: isHighlighted ? "inset 0 0 0px 3px #dd0000e5" : "",
           width: "100%",
           height: "100%",
           border: "none",
