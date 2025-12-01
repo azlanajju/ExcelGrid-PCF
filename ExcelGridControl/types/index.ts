@@ -41,6 +41,8 @@ export interface ExcelGridProps {
   fileSetCells?: number[];
   ignoreValidationColumn?: string[];
   tableEditable: boolean;
+  showUploadButton: boolean;
+  showDownloadButton: boolean;
   noValidaton: boolean;
   headerEditable?: boolean;
   showAddRowButton?: boolean;

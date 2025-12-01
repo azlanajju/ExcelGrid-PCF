@@ -334,6 +334,7 @@ useEffect(() => {
         </div>
         <Toolbar tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton}
           // addRow={() => setData((prev) => [...prev, new Array(prev[0].length).fill("")])} 
+          showDownloadButton={props.showDownloadButton} showUploadButton={props.showUploadButton}
           addRow={() => setData(function (prev) {
 
             // If no rows or only header, allow adding row

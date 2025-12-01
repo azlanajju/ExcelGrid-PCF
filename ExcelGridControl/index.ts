@@ -23,6 +23,8 @@ const constants = {
   headerEditable: true,
   showAddRowButton: true,
   showAddColumnButton: true,
+  showUploadButton: true,
+  showDownloadButton: true,
   noValidaton: false,
   sumTotalColumns: "",
   conversionCols: "",
@@ -81,6 +83,8 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
   private headerEditable = constants.headerEditable;
   private showAddRowButton = constants.showAddRowButton;
   private showAddColumnButton = constants.showAddColumnButton;
+  private showUploadButton = constants.showUploadButton;
+  private showDownloadButton = constants.showDownloadButton;
   private noValidaton = constants.noValidaton;
   private sumTotalColumns = constants.sumTotalColumns;
   private readOnlyColumns = "";
@@ -148,6 +152,8 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       multiLineCols: this.multiLineCols,
       formulaDefiniation: this.formulaDefiniation,
       tableEditable: this.tableEditable,
+      showUploadButton: this.showUploadButton,
+      showDownloadButton: this.showDownloadButton,
       noValidaton: this.noValidaton,
       sumTotalColumns: this.sumTotalColumns,
       readOnlyColumns: this.readOnlyColumns,
@@ -197,6 +203,8 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       prev.numberCols !== this.numberCols ||
       prev.formulaDefiniation !== this.formulaDefiniation ||
       prev.tableEditable !== this.tableEditable ||
+      prev.showUploadButton !== this.showUploadButton ||
+      prev.showDownloadButton !== this.showDownloadButton ||
       prev.noValidaton !== this.noValidaton ||
       prev.sumTotalColumns !== this.sumTotalColumns ||
       prev.readOnlyColumns !== this.readOnlyColumns ||
@@ -281,6 +289,8 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
     this.multiLineCols = this.getOrDefault(context.parameters.multiLineCols, constants.multiLineCols);
     this.formulaDefiniation = this.getOrDefault(context.parameters.formulaDefiniation, constants.formulaDefiniation);
     this.tableEditable = this.getOrDefault(context.parameters.tableEditable, constants.tableEditable);
+    this.showUploadButton = this.getOrDefault(context.parameters.showUploadButton, constants.showUploadButton);
+    this.showDownloadButton = this.getOrDefault(context.parameters.showDownloadButton, constants.showDownloadButton);
     this.noValidaton = this.getOrDefault(context.parameters.noValidaton, constants.noValidaton);
     this.headerEditable = this.getOrDefault(context.parameters.headerEditable, constants.headerEditable);
     this.showAddRowButton = this.getOrDefault(context.parameters.showAddRowButton, constants.showAddRowButton);
@@ -355,6 +365,8 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
         readOnlyColumns: readOnlyColumnsArray,
         conversionCols: this.conversionCols ? JSON.parse(this.conversionCols) : undefined,
         tableEditable: this.tableEditable,
+        showUploadButton: this.showUploadButton,
+        showDownloadButton: this.showDownloadButton,
         noValidaton: this.noValidaton,
         headerEditable: this.headerEditable,
         showAddRowButton: this.showAddRowButton,
