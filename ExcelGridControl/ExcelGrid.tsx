@@ -24,10 +24,7 @@ import { isValidDropdownValue } from "./utils/validation";
 
 export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
   const { data, setData, rowIds, dataWithTotals, configData, columnsWithTotals, setColumnsWithTotals } = useExcelData(props);
-useEffect(() => {
-  console.log("props.resetConfig",props.resetConfig);
-  
-},[props.resetConfig])
+
   const { selection, focusedCell, setSelection, setFocusedCell, startSelection, extendSelection, endSelection, getSelectedRange } = useSelection();
 
  const [visible, setVisible] = useState(false); 
@@ -181,14 +178,18 @@ useEffect(() => {
     }
   }, [data, setColWidths]);
 
-  const handleCellClick = useCallback(
-    (row: number, col: number, e: React.MouseEvent) => {
+  const handleCellClick = useCallback(    
+    (e: React.MouseEvent,row: number, col: number) => {
+    console.log("Clicked",row,col);
+
       if (row === 0 || !hasDropdownOptions(col) || hasFormula(col, props.formulaConfig)) {
         setActiveDropdown(null);
         return;
       }
       e.stopPropagation();
       const options = getDropdownOptions(col);
+      console.log("Called drp down",options);
+      
       const currentValue = String(data[row][col] || "");
       setActiveDropdown({
         row,

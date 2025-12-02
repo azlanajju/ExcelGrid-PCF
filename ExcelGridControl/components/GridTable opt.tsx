@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 
-// Define interface
 interface GridCellProps {
   value: string | number;
   id: string;
@@ -54,13 +53,15 @@ const GridCellComponent: React.FC<GridCellProps> = ({
 }) => {
   const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null);
   
-  // 1. Local State to force re-render on MouseUp
-  const [mouseUpTrigger, setMouseUpTrigger] = useState(false);
+  // Sync internal state for input performance (avoids parent re-render on every keystroke)
   const [localValue, setLocalValue] = useState(String(value));
 
   useEffect(() => {
     setLocalValue(String(value));
   }, [value]);
+
+  const [mouseUp,setMouseUp]=useState(false);
+ 
 
   useEffect(() => {
     if (selected && inputRef.current) {
@@ -107,6 +108,7 @@ const GridCellComponent: React.FC<GridCellProps> = ({
     }
   }, [row, isTotalRow, frozen, frozenLeft, textAlign, headerStyle, bodyStyle, disabled, isEditable]);
 
+  
   const handleBlur = () => {
     if (!focused && hasDropdown) {
       if (checkDropDown(`${localValue}`)) {
@@ -123,6 +125,7 @@ const GridCellComponent: React.FC<GridCellProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newVal = e.target.value;
     setLocalValue(newVal);
+    // Only trigger parent update immediately for dropdowns to filter options
     if (hasDropdown) onChange(row, col, newVal); 
   };
 
@@ -191,20 +194,18 @@ const GridCellComponent: React.FC<GridCellProps> = ({
         onMouseDown(row, col);
       }}
       onMouseOver={() => onMouseOver(row, col)}
-      
-      // 2. Updated onMouseUp logic
-      onMouseUp={() => {
-        // Toggle local state to force this specific cell to re-render
-        setMouseUpTrigger(prev => !prev); 
-        onMouseUp(); // Call parent handler
-      }}
-      
+      onMouseUp={(e) =>{ console.log("Mouse up",row,col);
+        setMouseUp(!mouseUp);
+       onMouseUp()}}
       onContextMenu={(e) => onContextMenu(e, row, col)}
       
+      // FIX 1: setTimeout forces this to run AFTER parent state updates "Selected" status
       onClick={(e) => {
-        onClick(e, row, col);
+        onClick(e, row, col); // Trigger selection in parent
+        
         setTimeout(() => {
-            if (hasDropdown) onCellDropDown(id, headerVal, false, "No");
+            if (hasDropdown) {console.log("Drop down",id);
+             onCellDropDown(id, headerVal, false, "No");}
             else onCellDropDown(id, headerVal, false, "Yes");
         }, 0);
       }}
@@ -223,6 +224,7 @@ const GridCellComponent: React.FC<GridCellProps> = ({
         <div style={{
            display: "flex", flexDirection: "row", gap: "8px", alignItems: "center", justifyContent: "center", height: "100%", width: "100%", background: "white", position: "relative", top: "-2px" 
         }}>
+           {/* Re-implement your Upload SVG buttons here or call a sub-component */}
            {value === "" ? <span>No File</span> : <button onClick={() => onFileView(String(row), headerVal, value as string)}>View</button>}
         </div> 
         : renderNormalInput()
@@ -239,7 +241,7 @@ const GridCellComponent: React.FC<GridCellProps> = ({
   );
 };
 
-// 3. Updated Comparator
+// FIX 2: Added missing checks for headerVal, hasDropdown, and isEditable
 const arePropsEqual = (prev: GridCellProps, next: GridCellProps) => {
   return (
     prev.value === next.value &&
@@ -253,9 +255,7 @@ const arePropsEqual = (prev: GridCellProps, next: GridCellProps) => {
 
     prev.hasDropdown === next.hasDropdown && 
     prev.isEditable === next.isEditable &&
-    prev.headerVal === next.headerVal &&
-    // Check if the onMouseUp handler itself changed (allows parent to force update if function ref changes)
-    prev.onMouseUp === next.onMouseUp 
+    prev.headerVal === next.headerVal // Crucial: Ensures Dropdown opens for the correct column when navigating
   );
 };
 

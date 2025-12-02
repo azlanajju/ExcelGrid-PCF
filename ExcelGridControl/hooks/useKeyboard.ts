@@ -112,9 +112,9 @@ export const useKeyboard = ({ data, setData, selection, focusedCell, setFocusedC
               setSelection({ start: [nextRow, nextCol], end: [nextRow, nextCol] });
 
               return [
-                ...prev.slice(0, -1),  // everything except last
-                lastRow,                // shift old last row
-                emptyRow,              // new blank row
+                ...prev.slice(0, -1),  
+                lastRow,                
+                emptyRow,             
               ];
             });
 
