@@ -37,6 +37,7 @@ export interface ExcelGridProps {
   cellHighlight?: string[];
   cellsDisabled?: string[];
   formulaConfig?: FormulaConfig;
+  uploadChange: (val: string) => void
   frozenColumns?: number[];
   fileSetCells?: number[];
   ignoreValidationColumn?: string[];

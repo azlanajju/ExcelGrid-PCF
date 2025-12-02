@@ -31,6 +31,7 @@
     <property name="showDownloadButton" display-name-key="Show-Download-Button" description-key="Show Download Column button in toolbar and context menu" of-type="TwoOptions" usage="input" required="false" />
     <property name="sumTotalColumns" display-name-key="Totaled-Columns" description-key="Columns with total sumed semicolon sapearated" of-type="SingleLine.Text" usage="bound" required="false" />
     <property name="readOnlyColumns" display-name-key="Read-Only-Columns" description-key="Columns that are read-only (view-only), semicolon separated column indices" of-type="SingleLine.Text" usage="bound" required="false" />
+    <property name="uploadingFile" display-name-key="UploadingFileSign" description-key="Sign that file is uploading" of-type="SingleLine.Text" usage="bound" required="false" />
   
 
     <!-- File properties -->

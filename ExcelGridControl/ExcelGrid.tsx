@@ -20,7 +20,7 @@ import { ExcelGridProps } from "./types";
 import { twoDArrayToJson } from "./utils/converters";
 import { downloadExcel, downloadExcelAll } from "./utils/download";
 import { getFormula, hasFormula, hasUpload } from "./utils/formulas";
-import { isValidDropdownValue } from "./utils/validation";
+// import { isValidDropdownValue } from "./utils/validation";
 
 export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
   const { data, setData, rowIds, dataWithTotals, configData, columnsWithTotals, setColumnsWithTotals } = useExcelData(props);
@@ -333,7 +333,7 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
           <h3 className="excel-title">{props.title}</h3>
 
         </div>
-        <Toolbar tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton}
+        <Toolbar uploadChange={props.uploadChange} tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton}
           // addRow={() => setData((prev) => [...prev, new Array(prev[0].length).fill("")])} 
           showDownloadButton={props.showDownloadButton} showUploadButton={props.showUploadButton}
           addRow={() => setData(function (prev) {

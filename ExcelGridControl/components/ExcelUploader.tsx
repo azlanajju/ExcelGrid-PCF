@@ -3,12 +3,15 @@ import * as XLSX from "xlsx";
 
 type ExcelUploaderProps = {
   onDataLoaded: (matrix: (string | number)[][]) => void;
+  uploadChange: (val: string) => void
 };
 
-const ExcelUploader: React.FC<ExcelUploaderProps> = ({ onDataLoaded }) => {
+const ExcelUploader: React.FC<ExcelUploaderProps> = ({ onDataLoaded,uploadChange }) => {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    uploadChange("Uploading");
 
     const reader = new FileReader();
     reader.onload = (evt) => {

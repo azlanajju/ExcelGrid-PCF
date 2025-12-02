@@ -184,7 +184,7 @@ const GridCellComponent: React.FC<GridCellProps> = ({
 
   return (
     <td
-      className={`excel-cell ${frozen ? "frozen" : ""} ${selected ? "selected" : ""} ${focused ? "focused" : ""} ${hasDropdown ? "dropdown-cell" : ""} ${isFormula ? "formula-cell" : ""} ${!isEditable ? "readonly-cell" : ""} ${isTotalRow ? "total-cell" : ""}`}
+      className={`excel-cell ${frozen ? "frozen" : ""} ${selected && !focused ? "selected" : ""} ${focused ? "focused" : ""} ${hasDropdown ? "dropdown-cell" : ""} ${isFormula ? "formula-cell" : ""} ${!isEditable ? "readonly-cell" : ""} ${isTotalRow ? "total-cell" : ""}`}
       style={{ ...cellStyle, height: "28px" }}
       onMouseDown={(e) => {
         if ((e.target as HTMLElement).closest(".dropdown-menu")) return;

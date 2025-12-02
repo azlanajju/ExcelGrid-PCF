@@ -13,9 +13,10 @@ interface ToolbarProps {
   getDropdownOptions: (col: number) => string[];
   showDownloadButton: boolean;
   showUploadButton: boolean;
+  uploadChange: (val: string) => void
 }
 
-export const Toolbar: React.FC<ToolbarProps> = ({ tableEditable, showAddRowButton = true,showUploadButton,showDownloadButton, showAddColumnButton = true, addRow, addCol, downloadExcel, downloadExcelAll, onDataLoaded, getDropdownOptions }) => {
+export const Toolbar: React.FC<ToolbarProps> = ({ tableEditable, showAddRowButton = true,showUploadButton,showDownloadButton, showAddColumnButton = true, addRow, addCol, downloadExcel, downloadExcelAll, onDataLoaded, getDropdownOptions,uploadChange }) => {
   if (!tableEditable) return null;
 
   return (
@@ -54,7 +55,7 @@ export const Toolbar: React.FC<ToolbarProps> = ({ tableEditable, showAddRowButto
           <path d="M12 15V3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
         </svg>
       </button>}
-      {showUploadButton && <ExcelUploader onDataLoaded={onDataLoaded} />}
+      {showUploadButton && <ExcelUploader uploadChange={uploadChange} onDataLoaded={onDataLoaded} />}
     </div>
   );
 };

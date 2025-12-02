@@ -34,6 +34,7 @@ const constants = {
   dropDownDelay: "100",
   selectedCell: "",
   fileSetCells: "", // ✅ new
+  uploadingFile: "",
 
   header: {
     fontFamily: "inherit",
@@ -90,6 +91,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
   private readOnlyColumns = "";
   private conversionCols = constants.conversionCols;
   private columnOrder = "";
+  private uploadingFile = "";
 
   private uploadingCell: string = "";
   private viewingCell: string = "";
@@ -159,6 +161,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       readOnlyColumns: this.readOnlyColumns,
       conversionCols: this.conversionCols,
       columnOrder: this.columnOrder,
+      uploadingFile: this.uploadingFile,
 
       // Header
       headerFontFamily: this.headerFontFamily,
@@ -210,6 +213,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       prev.readOnlyColumns !== this.readOnlyColumns ||
       prev.conversionCols !== this.conversionCols ||
       prev.columnOrder !== this.columnOrder ||
+      prev.uploadingFile !== this.uploadingFile ||
       // Header checks
       prev.headerFontFamily !== this.headerFontFamily ||
       prev.headerFontSize !== this.headerFontSize ||
@@ -299,6 +303,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
     this.readOnlyColumns = this.getOrDefault(context.parameters.readOnlyColumns, "");
     this.conversionCols = "";
     this.columnOrder = this.getOrDefault(context.parameters.columnOrder, "");
+    this.uploadingFile = this.getOrDefault(context.parameters.uploadingFile, "");
   }
 
   private renderGrid() {
@@ -379,6 +384,10 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
         columnOrder: this.columnOrder,
         dropDownDelay: parseInt(this.dropDownDelay),
         selectedCell: this.selectedCell,
+        uploadChange : (val:string) => {
+          this.uploadingFile = val;
+          this.notifyOutputChanged();
+        },
 
         // onDataChange: (data: string[][], frozenColumns = "", fileSetCells = "") => {
         //   this.sampleGrid = JSON.stringify(data);
@@ -453,6 +462,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       columnDropdownSelected: this.columnDropdownSelected,
       selectedCell: this.selectedCell,
       columnOrder: this.columnOrder,
+      uploadingFile: this.uploadingFile,
     };
   }
 
