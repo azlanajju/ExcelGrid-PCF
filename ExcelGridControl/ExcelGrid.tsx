@@ -70,6 +70,12 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
     activeDropdownRef.current = activeDropdown;
   }, [activeDropdown]);
 
+  const gridConfigValsRef = useRef(props.gridConfigVals);
+
+  useEffect(() => {
+    gridConfigValsRef.current = props.gridConfigVals;
+  }, [props.gridConfigVals]);
+
   useEffect(() => {
     console.log("multiLineCols", props.multiLineCols, props.numberCols);
   }, [props.multiLineCols, props.numberCols])
@@ -129,16 +135,18 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
 
   const getDropdownOptions = useCallback(
     (col?: number): string[] => {
-      return props.gridConfigVals || [];
+      return gridConfigValsRef.current || [];
     },
-    [props.gridConfigVals]
+    []
   );
 
   const checkDropDown = useCallback((stringVal: string) => {
-    if (props.gridConfigVals.length == 0) return true
+    if (!gridConfigValsRef.current || gridConfigValsRef.current.length == 0) return true
 
-    return props.gridConfigVals.includes(stringVal)
-  }, [props.gridConfigVals]);
+    return gridConfigValsRef.current.includes(stringVal)
+  }, []);
+
+
 
 
 
@@ -307,10 +315,11 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
   }, [activeDropdown]);
 
   // ✅ FIX: Update dropdown options if props.gridConfigVals changes
+  // ✅ FIX: Update dropdown options if props.gridConfigVals changes
   useEffect(() => {
-    if (!activeDropdown) return;
-    const newOptions = getDropdownOptions(activeDropdown.col);
-    if (!isEqual(newOptions, activeDropdown.options)) {
+    if (!activeDropdownRef.current) return;
+    const newOptions = props.gridConfigVals || [];
+    if (!isEqual(newOptions, activeDropdownRef.current.options)) {
       setActiveDropdown((prev) =>
         prev
           ? {
