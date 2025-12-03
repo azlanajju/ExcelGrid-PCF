@@ -26,7 +26,7 @@ interface GridCellProps {
   onClick: (e: React.MouseEvent, row: number, col: number) => void;
   onChange: (row: number, col: number, value: string) => void;
   onFocus: (row: number, col: number) => void;
-  onBlur: (row: number, col: number) => void; 
+  onBlur: (row: number, col: number) => void;
   checkDropDown: (stringVal: string) => boolean;
   onCellDropDown: (row: string, col: string, isReset?: boolean, isCell?: string) => void;
   startResize: (e: React.MouseEvent, index: number, isCol: boolean) => void;
@@ -45,15 +45,15 @@ interface GridCellProps {
 }
 
 const GridCellComponent: React.FC<GridCellProps> = ({
-  value, row, id, col, selected, focused, frozen, fileSetCell, hasDropdown, hasUpload, 
+  value, row, id, col, selected, focused, frozen, fileSetCell, hasDropdown, hasUpload,
   isFormula, isEditable, isTotalRow, headerStyle, bodyStyle, textAlign = "center",
   onMouseDown, onMouseOver, onMouseUp, onContextMenu, onClick, onChange, onFocus, onBlur,
-  startResize, frozenLeft, colRefs, cellRefs, onFileUpdload, onFileView, 
-  headerVal, onCellDropDown, isHighlighted, disabled, isMultiLineInput = false, 
+  startResize, frozenLeft, colRefs, cellRefs, onFileUpdload, onFileView,
+  headerVal, onCellDropDown, isHighlighted, disabled, isMultiLineInput = false,
   isNumber = false, checkDropDown
 }) => {
   const inputRef = useRef<HTMLTextAreaElement | HTMLInputElement | null>(null);
-  
+
   // 1. Local State to force re-render on MouseUp
   const [mouseUpTrigger, setMouseUpTrigger] = useState(false);
   const [localValue, setLocalValue] = useState(String(value));
@@ -64,7 +64,7 @@ const GridCellComponent: React.FC<GridCellProps> = ({
 
   useEffect(() => {
     if (selected && inputRef.current) {
-        inputRef.current.focus({ preventScroll: true }); 
+      inputRef.current.focus({ preventScroll: true });
     }
   }, [selected]);
 
@@ -123,7 +123,7 @@ const GridCellComponent: React.FC<GridCellProps> = ({
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newVal = e.target.value;
     setLocalValue(newVal);
-    if (hasDropdown) onChange(row, col, newVal); 
+    if (hasDropdown) onChange(row, col, newVal);
   };
 
   const commonInputProps = {
@@ -191,24 +191,24 @@ const GridCellComponent: React.FC<GridCellProps> = ({
         onMouseDown(row, col);
       }}
       onMouseOver={() => onMouseOver(row, col)}
-      
+
       // 2. Updated onMouseUp logic
       onMouseUp={() => {
         // Toggle local state to force this specific cell to re-render
-        setMouseUpTrigger(prev => !prev); 
+        setMouseUpTrigger(prev => !prev);
         onMouseUp(); // Call parent handler
       }}
-      
+
       onContextMenu={(e) => onContextMenu(e, row, col)}
-      
+
       onClick={(e) => {
         onClick(e, row, col);
         setTimeout(() => {
-            if (hasDropdown) onCellDropDown(id, headerVal, false, "No");
-            else onCellDropDown(id, headerVal, false, "Yes");
+          if (hasDropdown) onCellDropDown(id, headerVal, false, "No");
+          else onCellDropDown(id, headerVal, false, "Yes");
         }, 0);
       }}
-      
+
       ref={(el) => {
         if (colRefs.current && !colRefs.current[col]) colRefs.current[col] = el!;
         if (!cellRefs.current[row]) cellRefs.current[row] = [];
@@ -216,15 +216,15 @@ const GridCellComponent: React.FC<GridCellProps> = ({
       }}
     >
       <div className="col-resizer" onMouseDown={(e) => startResize(e, col, true)} />
-      <div className="row-resizer" onMouseDown={(e) => startResize(e, row, false)} 
-           style={{ borderBottom: selected || focused ? "none" : "1px solid #e1e7ff" }} />
+      <div className="row-resizer" onMouseDown={(e) => startResize(e, row, false)}
+        style={{ borderBottom: selected || focused ? "none" : "1px solid #e1e7ff" }} />
 
-      {row === 0 ? renderHeaderInput() : (fileSetCell && !isTotalRow && hasUpload) ? 
+      {row === 0 ? renderHeaderInput() : (fileSetCell && !isTotalRow && hasUpload) ?
         <div style={{
-           display: "flex", flexDirection: "row", gap: "8px", alignItems: "center", justifyContent: "center", height: "100%", width: "100%", background: "white", position: "relative", top: "-2px" 
+          display: "flex", flexDirection: "row", gap: "8px", alignItems: "center", justifyContent: "center", height: "100%", width: "100%", background: "white", position: "relative", top: "-2px"
         }}>
-           {value === "" ? <span>No File</span> : <button onClick={() => onFileView(String(row), headerVal, value as string)}>View</button>}
-        </div> 
+          {value === "" ? <span>No File</span> : <button onClick={() => onFileView(String(row), headerVal, value as string)}>View</button>}
+        </div>
         : renderNormalInput()
       }
 
@@ -248,14 +248,19 @@ const arePropsEqual = (prev: GridCellProps, next: GridCellProps) => {
     prev.isHighlighted === next.isHighlighted &&
     prev.disabled === next.disabled &&
     prev.frozen === next.frozen &&
-    prev.frozenLeft === next.frozenLeft && 
+    prev.frozenLeft === next.frozenLeft &&
     prev.textAlign === next.textAlign &&
 
-    prev.hasDropdown === next.hasDropdown && 
+    prev.hasDropdown === next.hasDropdown &&
     prev.isEditable === next.isEditable &&
     prev.headerVal === next.headerVal &&
     // Check if the onMouseUp handler itself changed (allows parent to force update if function ref changes)
-    prev.onMouseUp === next.onMouseUp 
+    prev.onMouseUp === next.onMouseUp &&
+    prev.onClick === next.onClick &&
+    prev.onChange === next.onChange &&
+    prev.onFocus === next.onFocus &&
+    prev.checkDropDown === next.checkDropDown &&
+    prev.onCellDropDown === next.onCellDropDown
   );
 };
 

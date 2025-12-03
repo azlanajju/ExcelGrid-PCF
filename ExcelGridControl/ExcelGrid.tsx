@@ -27,7 +27,7 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
 
   const { selection, focusedCell, setSelection, setFocusedCell, startSelection, extendSelection, endSelection, getSelectedRange } = useSelection();
 
- const [visible, setVisible] = useState(false); 
+  const [visible, setVisible] = useState(false);
 
   const { columnWidths, rowHeights, startResize, colRefs, colWidths, setColWidths, tableRef } = useResize(data);
 
@@ -48,6 +48,10 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
     return () => clearTimeout(timer);
   }, [toast]);
 
+  const cellRefs = useRef<(HTMLTableCellElement | null)[][]>([]);
+
+
+  const { activeDropdown, setActiveDropdown, selectDropdownOption, getDropdownPosition } = useDropdown(data, setData, configData, cellRefs, tableRef);
 
 
 
@@ -55,12 +59,22 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
     console.log("Version:", 1.7);
   }, []);
 
+  const dataRef = useRef(data);
+  const activeDropdownRef = useRef(activeDropdown);
+
   useEffect(() => {
-    console.log("multiLineCols", props.multiLineCols,props.numberCols);
-  }, [props.multiLineCols,props.numberCols])
+    dataRef.current = data;
+  }, [data]);
+
+  useEffect(() => {
+    activeDropdownRef.current = activeDropdown;
+  }, [activeDropdown]);
+
+  useEffect(() => {
+    console.log("multiLineCols", props.multiLineCols, props.numberCols);
+  }, [props.multiLineCols, props.numberCols])
 
 
-  const cellRefs = useRef<(HTMLTableCellElement | null)[][]>([]);
   const inputRefs = useRef<(HTMLTableCellElement | null)[][]>([]);
 
   useEffect(() => {
@@ -103,7 +117,6 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
     setFrozenColumnsKey((prev) => prev + 1);
   }, [props.frozenColumnsString]);
 
-  const { activeDropdown, setActiveDropdown, selectDropdownOption, getDropdownPosition } = useDropdown(data, setData, configData, cellRefs, tableRef);
 
   const { updateFormulas } = useFormulas();
 
@@ -121,11 +134,11 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
     [props.gridConfigVals]
   );
 
-  const checkDropDown = (stringVal : string) => {
-    if(props.gridConfigVals.length==0) return true
-  
+  const checkDropDown = useCallback((stringVal: string) => {
+    if (props.gridConfigVals.length == 0) return true
+
     return props.gridConfigVals.includes(stringVal)
-  }
+  }, [props.gridConfigVals]);
 
 
 
@@ -178,9 +191,9 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
     }
   }, [data, setColWidths]);
 
-  const handleCellClick = useCallback(    
-    (e: React.MouseEvent,row: number, col: number) => {
-    console.log("Clicked",row,col);
+  const handleCellClick = useCallback(
+    (e: React.MouseEvent, row: number, col: number) => {
+      console.log("Clicked", row, col);
 
       if (row === 0 || !hasDropdownOptions(col) || hasFormula(col, props.formulaConfig)) {
         setActiveDropdown(null);
@@ -188,9 +201,9 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
       }
       e.stopPropagation();
       const options = getDropdownOptions(col);
-      console.log("Called drp down",options);
-      
-      const currentValue = String(data[row][col] || "");
+      console.log("Called drp down", options);
+
+      const currentValue = String(dataRef.current[row][col] || "");
       setActiveDropdown({
         row,
         col,
@@ -199,57 +212,57 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
         inputValue: currentValue,
       });
     },
-    [hasDropdownOptions, getDropdownOptions, data, props.formulaConfig]
+    [hasDropdownOptions, getDropdownOptions, props.formulaConfig]
   );
 
 
   const handleInputFocus = useCallback(
-  (row: number, col: number) => {
-    setFocusedCell([row, col]);
-    
-    if (row > 0 && hasDropdownOptions(col) && !hasFormula(col, props.formulaConfig)) {
-      const options = getDropdownOptions(col);
-      const currentValue = String(data[row][col] || "");
-      
-      setActiveDropdown({
-        row,
-        col,
-        options,
-        filteredOptions: options, // ✅ Show all options initially
-        inputValue: currentValue,
-      });
-    } else {
-      setActiveDropdown(null);
-    }
-  },
-  [hasDropdownOptions, getDropdownOptions, data, props.formulaConfig]
-);
+    (row: number, col: number) => {
+      setFocusedCell([row, col]);
+
+      if (row > 0 && hasDropdownOptions(col) && !hasFormula(col, props.formulaConfig)) {
+        const options = getDropdownOptions(col);
+        const currentValue = String(dataRef.current[row][col] || "");
+
+        setActiveDropdown({
+          row,
+          col,
+          options,
+          filteredOptions: options, // ✅ Show all options initially
+          inputValue: currentValue,
+        });
+      } else {
+        setActiveDropdown(null);
+      }
+    },
+    [hasDropdownOptions, getDropdownOptions, props.formulaConfig]
+  );
 
   const handleChange = useCallback(
-  (row: number, col: number, value: string) => {
-    if (!isCellEditable(row, col)) return;
+    (row: number, col: number, value: string) => {
+      if (!isCellEditable(row, col)) return;
 
-    setData((prev) => {
-      const newData = prev.map((r) => [...r]);
-       newData[row][col] = value;
-      return updateFormulas(newData, props.formulaConfig);
-    });
-
-    // ✅ ADD THIS: Filter dropdown options based on input
-    if (activeDropdown && activeDropdown.row === row && activeDropdown.col === col) {
-      const filtered = activeDropdown.options.filter((opt) =>
-        opt.toLowerCase().includes(value.toLowerCase())
-      );
-      
-      setActiveDropdown({
-        ...activeDropdown,
-        inputValue: value,
-        filteredOptions: filtered.length > 0 ? filtered : activeDropdown.options,
+      setData((prev) => {
+        const newData = prev.map((r) => [...r]);
+        newData[row][col] = value;
+        return updateFormulas(newData, props.formulaConfig);
       });
-    }
-  },
-  [isCellEditable, props.formulaConfig, setData, updateFormulas, activeDropdown]
-);
+
+      // ✅ ADD THIS: Filter dropdown options based on input
+      if (activeDropdownRef.current && activeDropdownRef.current.row === row && activeDropdownRef.current.col === col) {
+        const filtered = activeDropdownRef.current.options.filter((opt) =>
+          opt.toLowerCase().includes(value.toLowerCase())
+        );
+
+        setActiveDropdown({
+          ...activeDropdownRef.current,
+          inputValue: value,
+          filteredOptions: filtered.length > 0 ? filtered : activeDropdownRef.current.options,
+        });
+      }
+    },
+    [isCellEditable, props.formulaConfig, setData, updateFormulas]
+  );
 
   const validateAndCorrectValue = useCallback(
     (row: number, col: number) => {
@@ -393,8 +406,8 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
           }} getDropdownOptions={getDropdownOptions} />
       </div>
 
-      <div className="excel-scroll-container" onScroll={handleScroll} 
-      style={{maxHeight:props.height ? `${props.height}px` : 'max-height: calc(100vh - 350px)'}} >
+      <div className="excel-scroll-container" onScroll={handleScroll}
+        style={{ maxHeight: props.height ? `${props.height}px` : 'max-height: calc(100vh - 350px)' }} >
         <GridTable data={dataWithTotals} selection={selection} focusedCell={focusedCell} frozenCols={localFrozenColumns}
           fileSetCells={localFileSetCells} configData={configData} tableEditable={props.tableEditable}
           headerStyle={props.headerStyle} bodyStyle={props.bodyStyle} onCellClick={handleCellClick}
@@ -404,11 +417,11 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
           getFormula={(col) => getFormula(col, props.formulaConfig)} hasUpload={hasUpload} validateAndCorrectValue={validateAndCorrectValue}
           isCellEditable={isCellEditable} colWidths={colWidths} getFrozenLeft={getFrozenLeft} tableRef={tableRef}
           cellRefs={cellRefs} colRefs={colRefs} conversionConfig={props.conversionCols} onFileUpdload={props.onFileUpdload}
-          onFileView={props.onFileView} onCellDropDown={props.onCellDropDown} getCellAlignment={getCellAlignment} 
+          onFileView={props.onFileView} onCellDropDown={props.onCellDropDown} getCellAlignment={getCellAlignment}
           multiLineCols={props.multiLineCols} numberCols={props.numberCols} cellHighlight={props.cellHighlight}
-           cellsDisabled={props.cellsDisabled} checkDropDown={checkDropDown} {...props} />
+          cellsDisabled={props.cellsDisabled} checkDropDown={checkDropDown} {...props} />
 
-        {activeDropdown && <DropdownMenu dropDownDelay={props.dropDownDelay} activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection}  />}
+        {activeDropdown && <DropdownMenu dropDownDelay={props.dropDownDelay} activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection} />}
       </div>
 
       {contextMenu && (
