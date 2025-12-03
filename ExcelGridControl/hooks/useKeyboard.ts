@@ -16,9 +16,10 @@ interface UseKeyboardProps {
   setToast: React.Dispatch<React.SetStateAction<string>>;
   ignoreValidationColumn?: string[];
   noValidaton: boolean;
+  handleUploadStatus: (status: string) => void
 }
 
-export const useKeyboard = ({ data, setData, selection, focusedCell, setFocusedCell, setSelection, isCellEditable, hasFormula, hasDropdownOptions, updateFormulas, getDropdownOptions, setToast,ignoreValidationColumn,noValidaton }: UseKeyboardProps) => {
+export const useKeyboard = ({ data, setData, handleUploadStatus, selection, focusedCell, setFocusedCell, setSelection, isCellEditable, hasFormula, hasDropdownOptions, updateFormulas, getDropdownOptions, setToast, ignoreValidationColumn, noValidaton }: UseKeyboardProps) => {
   const { clipboard, copyFromSystemClipboard, copySelection, cutSelection, pasteData } = useClipboard();
 
   const getSelectedRange = () => {
@@ -112,9 +113,9 @@ export const useKeyboard = ({ data, setData, selection, focusedCell, setFocusedC
               setSelection({ start: [nextRow, nextCol], end: [nextRow, nextCol] });
 
               return [
-                ...prev.slice(0, -1),  
-                lastRow,                
-                emptyRow,             
+                ...prev.slice(0, -1),
+                lastRow,
+                emptyRow,
               ];
             });
 
@@ -181,6 +182,7 @@ export const useKeyboard = ({ data, setData, selection, focusedCell, setFocusedC
       const clipboardData = systemClipboard || clipboard;
 
       if (clipboardData) {
+        handleUploadStatus("Uploading");
         const [sr, sc] = selection.start;
         const newData = pasteData(data, clipboardData, sr, sc, isCellEditable, hasDropdownOptions, hasFormula, getDropdownOptions);
         setData(updateFormulas(newData));

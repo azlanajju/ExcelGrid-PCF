@@ -30,7 +30,7 @@ export interface ExcelGridProps {
   onFileView: (row: string, col: string, currVal: string) => void;
   inputGrid?: Cell[][] | string;
   gridConfig?: number[];
-  resetConfig : any;
+  resetConfig: any;
   multiLineCols?: number[];
   numberCols?: number[];
   gridConfigVals?: string[];
@@ -48,7 +48,8 @@ export interface ExcelGridProps {
   headerEditable?: boolean;
   showAddRowButton?: boolean;
   showAddColumnButton?: boolean;
-  dropDownDelay? : number;
+  dropDownDelay?: number;
+  uploadDelay?: number;
   selectedCell?: string;
   sumTotalColumns: number[];
   readOnlyColumns?: number[];

@@ -96,6 +96,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
   private uploadingCell: string = "";
   private viewingCell: string = "";
   private dropDownDelay: string = "100";
+  private uploadDelay: string = "1000";
   columnDropdownSelected: string = "";
   selectedCell: string = "";
 
@@ -142,6 +143,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       uploadingCell: this.uploadingCell,
       viewingCell: this.viewingCell,
       dropDownDelay: this.dropDownDelay,
+      uploadDelay: this.uploadDelay,
       columnDropdownSelected: this.columnDropdownSelected,
       selectedCell: this.selectedCell,
       sampleGrid: this.sampleGrid,
@@ -194,6 +196,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
       prev.uploadingCell !== this.uploadingCell ||
       prev.viewingCell !== this.viewingCell ||
       prev.dropDownDelay !== this.dropDownDelay ||
+      prev.uploadDelay !== this.uploadDelay ||
       prev.columnDropdownSelected !== this.columnDropdownSelected ||
       prev.selectedCell !== this.selectedCell ||
       prev.sampleGrid !== this.sampleGrid ||
@@ -246,7 +249,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
 
   private updateGridProps(context: ComponentFramework.Context<IInputs>) {
     // console.log("ignore val", this.getOrDefault(context.parameters.ignoreValidationColumn, constants.ignoreValidationColumn),context.parameters);
-// console.log("context.parameters.resetConfig",context.parameters.resetConfig);
+    // console.log("context.parameters.resetConfig",context.parameters.resetConfig);
 
     // Header styles
     this.headerFontFamily = this.getOrDefault(context.parameters.headerFontFamily, constants.header.fontFamily);
@@ -274,11 +277,12 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
     this.resetConfig = this.getOrDefault(context.parameters.resetConfig, constants.resetConfig);
     this.fileSetCells = this.getOrDefault(context.parameters.fileSetCells, constants.fileSetCells); // ✅ new
 
-    
+
 
     this.uploadingCell = this.getOrDefault(context.parameters.uploadingCell, constants.uploadingCell);
     this.viewingCell = this.getOrDefault(context.parameters.viewingCell, constants.viewingCell);
     this.dropDownDelay = this.getOrDefault(context.parameters.dropDownDelay, constants.dropDownDelay);
+    this.uploadDelay = this.getOrDefault(context.parameters.uploadDelay, "1000");
 
     this.columnDropdownSelected = this.getOrDefault(context.parameters.columnDropdownSelected, constants.columnDropdownSelected);
     this.selectedCell = this.getOrDefault(context.parameters.selectedCell, constants.selectedCell);
@@ -325,7 +329,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
     this.root.render(
       React.createElement(ExcelGrid, {
         inputGrid: this.sampleGrid,
-        resetConfig: this.resetConfig ? JSON.parse(this.resetConfig) : {} ,
+        resetConfig: this.resetConfig ? JSON.parse(this.resetConfig) : {},
         gridConfig: this.columnDefinition
           ? this.columnDefinition
             .trim()
@@ -383,8 +387,9 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
         fileSetCells: fileSetCellsArray,
         columnOrder: this.columnOrder,
         dropDownDelay: parseInt(this.dropDownDelay),
+        uploadDelay: parseInt(this.uploadDelay),
         selectedCell: this.selectedCell,
-        uploadChange : (val:string) => {
+        uploadChange: (val: string) => {
           this.uploadingFile = val;
           this.notifyOutputChanged();
         },

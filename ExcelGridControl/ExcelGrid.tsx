@@ -166,6 +166,15 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
     [props.tableEditable, props.headerEditable, props.formulaConfig, props.readOnlyColumns, data]
   );
 
+  const handleUploadStatus = (status: string) => {
+    props.uploadChange(status);
+    if (status === "Uploading") {
+      setTimeout(() => {
+        props.uploadChange("");
+      }, props.uploadDelay || 1000);
+    }
+  };
+
   const { handleKeyDown } = useKeyboard({
     data,
     setData,
@@ -180,10 +189,13 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
     updateFormulas: (newData) => updateFormulas(newData, props.formulaConfig),
     setToast: setToast,
     noValidaton: props.noValidaton,
-    ignoreValidationColumn: props.ignoreValidationColumn
+    ignoreValidationColumn: props.ignoreValidationColumn,
+    handleUploadStatus: handleUploadStatus
   });
 
   useClipboard();
+
+
 
   const [contextMenu, setContextMenu] = useState<{
     x: number;
@@ -355,7 +367,8 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
           <h3 className="excel-title">{props.title}</h3>
 
         </div>
-        <Toolbar uploadChange={props.uploadChange} tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton}
+
+        <Toolbar uploadChange={handleUploadStatus} tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton}
           // addRow={() => setData((prev) => [...prev, new Array(prev[0].length).fill("")])} 
           showDownloadButton={props.showDownloadButton} showUploadButton={props.showUploadButton}
           addRow={() => setData(function (prev) {
@@ -392,9 +405,9 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
 
             // Add new row
             return prev.concat([new Array(prev[0].length).fill("")]);
-          })
+          })}
 
-          }
+
 
           addCol={() => setData((prev) => prev.map((row) => [...row, ""]))} downloadExcel={handleDownloadExcel} downloadExcelAll={handleDownloadExcelAll} onDataLoaded={(matrix) => {
             // Keep existing header and only update data rows
@@ -433,102 +446,106 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
         {activeDropdown && <DropdownMenu dropDownDelay={props.dropDownDelay} activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection} />}
       </div>
 
-      {contextMenu && (
-        <ContextMenu
-          contextMenu={contextMenu}
-          onClose={closeContextMenu}
-          showAddRowButton={props.showAddRowButton}
-          showAddColumnButton={props.showAddColumnButton}
-          onAddRow={(rowIndex) => setData(function (prev) {
+      {
+        contextMenu && (
+          <ContextMenu
+            contextMenu={contextMenu}
+            onClose={closeContextMenu}
+            showAddRowButton={props.showAddRowButton}
+            showAddColumnButton={props.showAddColumnButton}
+            onAddRow={(rowIndex) => setData(function (prev) {
 
-            // If no rows or only header, allow adding row
-            if (prev.length <= 1) {
+              // If no rows or only header, allow adding row
+              if (prev.length <= 1) {
+                return prev.concat([new Array(prev[0].length).fill("")]);
+              }
+
+              var headerRow = prev[0];
+              var lastRow = prev[prev.length - 1];
+              var isAnyEmpty = false;
+
+              for (var i = 0; i < lastRow.length; i++) {
+                var header = headerRow[i];
+
+                // If header is in ignore list → skip validation
+                if (props.ignoreValidationColumn.indexOf(header as string) !== -1) {
+                  continue;
+                }
+
+                // Otherwise validate the cell
+                if (lastRow[i] === "" || lastRow[i] == null) {
+                  isAnyEmpty = true;
+                  break;
+                }
+              }
+
+              if (isAnyEmpty && !props.noValidaton) {
+                setToast("Please fill all required cells before adding a new row.");
+                return prev;
+
+              }
+
+              // Add new row
               return prev.concat([new Array(prev[0].length).fill("")]);
-            }
-
-            var headerRow = prev[0];
-            var lastRow = prev[prev.length - 1];
-            var isAnyEmpty = false;
-
-            for (var i = 0; i < lastRow.length; i++) {
-              var header = headerRow[i];
-
-              // If header is in ignore list → skip validation
-              if (props.ignoreValidationColumn.indexOf(header as string) !== -1) {
-                continue;
-              }
-
-              // Otherwise validate the cell
-              if (lastRow[i] === "" || lastRow[i] == null) {
-                isAnyEmpty = true;
-                break;
-              }
-            }
-
-            if (isAnyEmpty && !props.noValidaton) {
-              setToast("Please fill all required cells before adding a new row.");
-              return prev;
-
-            }
-
-            // Add new row
-            return prev.concat([new Array(prev[0].length).fill("")]);
-          })
-
-          }
-          onAddCol={(colIndex) =>
-            setData((prev) => {
-              const newData = prev.map((row) => {
-                const newRow = [...row];
-                newRow.splice(colIndex + 1, 0, "");
-                return newRow;
-              });
-              return updateFormulas(newData, props.formulaConfig);
             })
-          }
-          onRemoveRow={(rowIndex) => {
-            if (rowIndex !== 0) {
+
+            }
+            onAddCol={(colIndex) =>
               setData((prev) => {
-                const newData = prev.filter((_, i) => i !== rowIndex);
+                const newData = prev.map((row) => {
+                  const newRow = [...row];
+                  newRow.splice(colIndex + 1, 0, "");
+                  return newRow;
+                });
                 return updateFormulas(newData, props.formulaConfig);
-              });
+              })
             }
-          }}
-          onRemoveCol={(colIndex) =>
-            setData((prev) => {
-              const newData = prev.map((row) => row.filter((_, i) => i !== colIndex));
-              return updateFormulas(newData, props.formulaConfig);
-            })
-          }
-          onToggleFreezeCol={(colIndex) => {
-            const currentFrozen = [...localFrozenColumns];
-            let updatedFrozen;
-            if (currentFrozen.includes(colIndex)) {
-              updatedFrozen = currentFrozen.filter((c) => c !== colIndex);
-            } else {
-              updatedFrozen = [...currentFrozen, colIndex];
+            onRemoveRow={(rowIndex) => {
+              if (rowIndex !== 0) {
+                setData((prev) => {
+                  const newData = prev.filter((_, i) => i !== rowIndex);
+                  return updateFormulas(newData, props.formulaConfig);
+                });
+              }
+            }}
+            onRemoveCol={(colIndex) =>
+              setData((prev) => {
+                const newData = prev.map((row) => row.filter((_, i) => i !== colIndex));
+                return updateFormulas(newData, props.formulaConfig);
+              })
             }
-            const sortedFrozen = updatedFrozen.sort((a, b) => a - b);
-            const stringFrozenCols = sortedFrozen.map((col) => col.toString()).join(";");
-            setLocalFrozenColumns(sortedFrozen);
-            props.onDataChange(twoDArrayToJson(data), stringFrozenCols);
-          }}
-          onToggleTotalColumn={(colIndex) => setColumnsWithTotals((prev) => (prev.includes(colIndex) ? prev.filter((col) => col !== colIndex) : [...prev, colIndex]))}
-          onSetTextAlign={setTextAlign}
-          columnsWithTotals={columnsWithTotals}
-          frozenCols={localFrozenColumns}
-        />
-      )}
+            onToggleFreezeCol={(colIndex) => {
+              const currentFrozen = [...localFrozenColumns];
+              let updatedFrozen;
+              if (currentFrozen.includes(colIndex)) {
+                updatedFrozen = currentFrozen.filter((c) => c !== colIndex);
+              } else {
+                updatedFrozen = [...currentFrozen, colIndex];
+              }
+              const sortedFrozen = updatedFrozen.sort((a, b) => a - b);
+              const stringFrozenCols = sortedFrozen.map((col) => col.toString()).join(";");
+              setLocalFrozenColumns(sortedFrozen);
+              props.onDataChange(twoDArrayToJson(data), stringFrozenCols);
+            }}
+            onToggleTotalColumn={(colIndex) => setColumnsWithTotals((prev) => (prev.includes(colIndex) ? prev.filter((col) => col !== colIndex) : [...prev, colIndex]))}
+            onSetTextAlign={setTextAlign}
+            columnsWithTotals={columnsWithTotals}
+            frozenCols={localFrozenColumns}
+          />
+        )
+      }
 
       <Footer data={dataWithTotals} configData={configData} formulaConfig={props.formulaConfig} columnsWithTotals={columnsWithTotals} selection={selection} />
 
-      {toast && (
-        <div className="toast-popup">
-          {toast}
-        </div>
-      )}
+      {
+        toast && (
+          <div className="toast-popup">
+            {toast}
+          </div>
+        )
+      }
 
 
-    </div>
+    </div >
   );
 };

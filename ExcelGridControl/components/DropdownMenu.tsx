@@ -30,15 +30,15 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
 
   // Controls fade-in, but dropdown mounts instantly (no flicker)
   const [visible, setVisible] = useState(false);
-    const [loading, setLoading] = useState(false);
-  
+  const [loading, setLoading] = useState(false);
+
+  const prevActiveDropdown = React.useRef<{ row: number; col: number } | null>(null);
+
 
   useEffect(() => {
-    if (!tableRef.current || !activeDropdown || position.top== 0 || position.left== 0) return;
+    if (!tableRef.current || !activeDropdown || position.top == 0 || position.left == 0) return;
 
     // console.log("position",position);
-    
-    setVisible(false);
 
     const dropdownHeight =
       activeDropdown.filteredOptions.length === 0
@@ -77,15 +77,27 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
       maxHeight,
     });
 
-    // Make it appear smoothly after layout calc
-    // requestAnimationFrame(() => setVisible(true));
+    // Only reset visibility/loading if the cell position changed
+    if (
+      !prevActiveDropdown.current ||
+      prevActiveDropdown.current.row !== activeDropdown.row ||
+      prevActiveDropdown.current.col !== activeDropdown.col
+    ) {
+      setVisible(false);
+      setLoading(true);
+      const timer = setTimeout(() => setVisible(true), dropDownDelay);
 
-    setLoading(true)
-    
-    const timer = setTimeout(() => setVisible(true), dropDownDelay);
-    return () => clearTimeout(timer);
+      // Update ref
+      prevActiveDropdown.current = { row: activeDropdown.row, col: activeDropdown.col };
 
-  }, [ activeDropdown,activeDropdown.filteredOptions.length, tableRef, position]);
+      return () => clearTimeout(timer);
+    } else {
+      // If position is same (just options updated), ensure visible and not loading
+      setVisible(true);
+      setLoading(false);
+    }
+
+  }, [activeDropdown, activeDropdown.filteredOptions.length, tableRef, position]);
 
   // Auto-close on scroll/resize
   useEffect(() => {
@@ -109,25 +121,25 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   }, [activeDropdown, setActiveDropdown]);
 
   if (!activeDropdown || !tableEditable || !adjustedPosition || !visible) {
-      return loading ? <div
+    return loading ? <div
       className="dropdown-menu"
       style={{
         position: "fixed",
         top: `${adjustedPosition.top}px`,
         left: `${adjustedPosition.left}px`,
         width: `${adjustedPosition.width}px`,
-        maxHeight: activeDropdown.filteredOptions.length===1 ? '40vh' : `${adjustedPosition.maxHeight}px`,
+        maxHeight: activeDropdown.filteredOptions.length === 1 ? '40vh' : `${adjustedPosition.maxHeight}px`,
         overflowY: "auto",
         zIndex: 1001,
       }}
       onClick={(e) => e.stopPropagation()}
     >
-         <div className="dropdown-loader" >
-          <div className="spinner" />
-          <span>Loading options...</span>
-        </div>
-        </div> : 
-        null
+      <div className="dropdown-loader" >
+        <div className="spinner" />
+        <span>Loading options...</span>
+      </div>
+    </div> :
+      null
 
   }
 

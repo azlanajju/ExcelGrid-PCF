@@ -145,7 +145,8 @@ const GridCellComponent: React.FC<GridCellProps> = ({
           style={{
             ...cellStyle,
             boxShadow: isHighlighted ? "inset 0 0 0px 3px #dd0000e5" : "",
-            width: "100%", height: "100%", border: "none", background: "transparent",
+            width: "100%", height: "100%", border: "none",
+            //  background: "transparent",
             textAlign: "right", appearance: "none", MozAppearance: "textfield",
             padding: "6px 20px 10px 12px"
           }}
@@ -161,7 +162,8 @@ const GridCellComponent: React.FC<GridCellProps> = ({
           boxShadow: isHighlighted ? "inset 0 0 0px 3px #dd0000e5" : "",
           width: "100%", resize: "none", height: "100%", position: "relative",
           zIndex: selected || focused ? 10 : frozen ? 20 : 0,
-          textAlign: "left", border: "none", background: "transparent",
+          textAlign: "left", border: "none",
+          // background: "transparent",
         }}
       />
     );
@@ -185,7 +187,7 @@ const GridCellComponent: React.FC<GridCellProps> = ({
   return (
     <td
       className={`excel-cell ${frozen ? "frozen" : ""} ${selected && !focused ? "selected" : ""} ${focused ? "focused" : ""} ${hasDropdown ? "dropdown-cell" : ""} ${isFormula ? "formula-cell" : ""} ${!isEditable ? "readonly-cell" : ""} ${isTotalRow ? "total-cell" : ""}`}
-      style={{ ...cellStyle, height: "28px" }}
+      style={{ ...cellStyle, height: "28px", background: "#fff" }}
       onMouseDown={(e) => {
         if ((e.target as HTMLElement).closest(".dropdown-menu")) return;
         onMouseDown(row, col);
