@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Cell } from "../types";
 import Papa from "papaparse";
 
-export const useClipboard = () => {
+export const useClipboard = (uploadChange: (val: string) => void,uploadDelay:number) => {
   const [clipboard, setClipboard] = useState<Cell[][] | null>(null);
 
   const copyFromSystemClipboard = async (): Promise<Cell[][] | null> => {
@@ -16,7 +16,6 @@ export const useClipboard = () => {
         skipEmptyLines: true
       });
 
-      // PapaParse returns { data: (string[][]) }
       const rows = parsed.data as unknown as Cell[][];
       setClipboard(rows);
       return rows;
@@ -66,6 +65,9 @@ export const useClipboard = () => {
     return newData;
   };
 
+  // ---------------------------------------------------------
+  // Updated Paste Logic with Loading State
+  // ---------------------------------------------------------
   const pasteData = (
     data: Cell[][],
     clipboardData: Cell[][],
@@ -76,89 +78,85 @@ export const useClipboard = () => {
     hasFormula: (col: number) => boolean,
     getDropdownOptions: (col: number) => string[],
   ): Cell[][] => {
-    const newData = data.map(row => [...row]);
+    
+    // 1. Trigger Loading Start
+    uploadChange("uploading");
 
-    // Ensure enough rows and cols
-    const neededRows = startRow + clipboardData.length;
-    const maxColsInClipboard = Math.max(
-      ...clipboardData.map(row => row.length)
-    );
-    const neededCols = startCol + maxColsInClipboard;
-    const currentColCount = newData[0]?.length || 0;
+    try {
+      const newData = data.map(row => [...row]);
 
-    while (newData.length < neededRows) {
-      newData.push(new Array(currentColCount).fill(""));
-    }
+      // Ensure enough rows and cols
+      const neededRows = startRow + clipboardData.length;
+      const maxColsInClipboard = Math.max(
+        ...clipboardData.map(row => row.length)
+      );
+      const neededCols = startCol + maxColsInClipboard;
+      const currentColCount = newData[0]?.length || 0;
 
-    if (currentColCount < neededCols) {
-      const colsToAdd = neededCols - currentColCount;
-      for (let i = 0; i < newData.length; i++) {
-        if (!newData[i]) newData[i] = new Array(currentColCount).fill("");
-        for (let j = 0; j < colsToAdd; j++) {
-          newData[i].push("");
+      while (newData.length < neededRows) {
+        newData.push(new Array(currentColCount).fill(""));
+      }
+
+      if (currentColCount < neededCols) {
+        const colsToAdd = neededCols - currentColCount;
+        for (let i = 0; i < newData.length; i++) {
+          if (!newData[i]) newData[i] = new Array(currentColCount).fill("");
+          for (let j = 0; j < colsToAdd; j++) {
+            newData[i].push("");
+          }
         }
       }
-    }
 
-    // Paste values only into editable cells
-    for (let i = 0; i < clipboardData.length; i++) {
-      for (let j = 0; j < (clipboardData[i]?.length || 0); j++) {
-        const targetRow = startRow + i;
-        const targetCol = startCol + j;
+      // Paste values
+      for (let i = 0; i < clipboardData.length; i++) {
+        for (let j = 0; j < (clipboardData[i]?.length || 0); j++) {
+          const targetRow = startRow + i;
+          const targetCol = startCol + j;
 
-        if (
-          targetRow < newData.length &&
-          targetCol < newData[targetRow].length &&
-          isCellEditable(targetRow, targetCol)
-        ) {
-          newData[targetRow][targetCol] = clipboardData[i][j];
+          if (
+            targetRow < newData.length &&
+            targetCol < newData[targetRow].length &&
+            isCellEditable(targetRow, targetCol)
+          ) {
+            newData[targetRow][targetCol] = clipboardData[i][j];
+          }
         }
       }
-    }
 
-     // Paste values
-  for (let i = 0; i < clipboardData.length; i++) {
-    for (let j = 0; j < (clipboardData[i]?.length || 0); j++) {
-      const targetRow = startRow + i;
-      const targetCol = startCol + j;
+      // ✅ Validate dropdown values
+      for (let i = 0; i < clipboardData.length; i++) {
+        for (let j = 0; j < (clipboardData[i]?.length || 0); j++) {
+          const targetRow = startRow + i;
+          const targetCol = startCol + j;
 
-      if (
-        targetRow < newData.length &&
-        targetCol < newData[targetRow].length &&
-        isCellEditable(targetRow, targetCol)
-      ) {
-        newData[targetRow][targetCol] = clipboardData[i][j];
-      }
-    }
-  }
+          if (targetRow === 0 || hasFormula(targetCol)) continue;
 
-  // ✅ Validate dropdown values
-  for (let i = 0; i < clipboardData.length; i++) {
-    for (let j = 0; j < (clipboardData[i]?.length || 0); j++) {
-      const targetRow = startRow + i;
-      const targetCol = startCol + j;
+          if (
+            targetRow < newData.length &&
+            targetCol < newData[targetRow].length &&
+            hasDropdownOptions(targetCol)
+          ) {
+            const currentValue = String(newData[targetRow][targetCol] || "");
+            const options = getDropdownOptions(targetCol);
 
-      if (targetRow === 0 || hasFormula(targetCol)) continue;
-
-      if (
-        targetRow < newData.length &&
-        targetCol < newData[targetRow].length &&
-        hasDropdownOptions(targetCol)
-      ) {
-        const currentValue = String(newData[targetRow][targetCol] || "");
-        const options = getDropdownOptions(targetCol); // ✅ fetch real options
-
-        if (!options.includes(currentValue) && currentValue !== "") {
-          console.warn(
-            `Invalid value "${currentValue}" for dropdown col ${targetCol}. Clearing cell.`
-          );
-          newData[targetRow][targetCol] = "";
+            if (!options.includes(currentValue) && currentValue !== "") {
+              console.warn(
+                `Invalid value "${currentValue}" for dropdown col ${targetCol}. Clearing cell.`
+              );
+              newData[targetRow][targetCol] = "";
+            }
+          }
         }
       }
-    }
-  }
 
-  return newData;
+      return newData;
+    } finally {
+      // 2. Trigger Loading End (Always runs, even if error)
+      // We use a small timeout to ensure the UI has a chance to update if paste is instant
+      setTimeout(() => {
+          uploadChange("");
+      }, uploadDelay); 
+    }
   };
 
   return {

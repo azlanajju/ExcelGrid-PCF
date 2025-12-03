@@ -162,10 +162,12 @@ useEffect(() => {
     updateFormulas: (newData) => updateFormulas(newData, props.formulaConfig),
     setToast: setToast,
     noValidaton: props.noValidaton,
-    ignoreValidationColumn: props.ignoreValidationColumn
+    ignoreValidationColumn: props.ignoreValidationColumn,
+    uploadChange: props.uploadChange,
+    uploadDelay: props.uploadDelay
   });
 
-  useClipboard();
+  useClipboard(props.uploadChange,props.uploadDelay);
 
   const [contextMenu, setContextMenu] = useState<{
     x: number;
@@ -332,7 +334,7 @@ useEffect(() => {
           <h3 className="excel-title">{props.title}</h3>
 
         </div>
-        <Toolbar tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton}
+        <Toolbar uploadChange={props.uploadChange} uploadDelay={props.uploadDelay} tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton}
           // addRow={() => setData((prev) => [...prev, new Array(prev[0].length).fill("")])} 
           showDownloadButton={props.showDownloadButton} showUploadButton={props.showUploadButton}
           addRow={() => setData(function (prev) {
