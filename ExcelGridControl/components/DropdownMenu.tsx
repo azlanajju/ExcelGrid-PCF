@@ -161,16 +161,10 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
             {option}
           </div>
         ))
-      ) : gridConfigVals.length > 0 ? (
-        gridConfigVals.map((option, idx) => (
-          <div
-            key={idx}
-            className="dropdown-option"
-            onClick={() => onSelectOption(option)}
-          >
-            {option}
-          </div>
-        ))
+      ) : activeDropdown.options.length > 0 ? (
+        <div className="dropdown-no-results" style={{ padding: "8px 12px", color: "#666", fontStyle: "italic" }}>
+          <span>No results found</span>
+        </div>
       ) : (
         <div className="dropdown-loader">
           <div className="spinner" />

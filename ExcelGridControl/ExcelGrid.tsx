@@ -330,21 +330,29 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
 
   // ✅ FIX: Update dropdown options if props.gridConfigVals changes
   // ✅ FIX: Update dropdown options if props.gridConfigVals changes
+  // ✅ FIX: Update dropdown options if props.gridConfigVals changes
   useEffect(() => {
-    if (!activeDropdownRef.current) return;
+    if (!activeDropdown) return;
     const newOptions = props.gridConfigVals || [];
-    if (!isEqual(newOptions, activeDropdownRef.current.options)) {
+
+    // Only update if options have changed
+    if (!isEqual(newOptions, activeDropdown.options)) {
+      // Re-apply filter based on current input value
+      const filtered = newOptions.filter((opt) =>
+        opt.toLowerCase().includes(activeDropdown.inputValue.toLowerCase())
+      );
+
       setActiveDropdown((prev) =>
         prev
           ? {
             ...prev,
             options: newOptions,
-            filteredOptions: newOptions,
+            filteredOptions: filtered,
           }
           : null
       );
     }
-  }, [props.gridConfigVals, props.gridConfigVals.length]);
+  }, [props.gridConfigVals, activeDropdown]);
 
   return (
     <div className="excel-wrapper" onKeyDown={handleKeyDown} tabIndex={0}>
