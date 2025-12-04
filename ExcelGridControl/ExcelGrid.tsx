@@ -344,7 +344,7 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
           : null
       );
     }
-  }, [props.gridConfigVals]);
+  }, [props.gridConfigVals, props.gridConfigVals.length]);
 
   return (
     <div className="excel-wrapper" onKeyDown={handleKeyDown} tabIndex={0}>

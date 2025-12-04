@@ -10,6 +10,7 @@ interface DropdownMenuProps {
   tableRef: React.RefObject<HTMLTableElement>;
   endSelection: () => void;
   dropDownDelay: number;
+  gridConfigVals: string[];
 }
 
 export const DropdownMenu: React.FC<DropdownMenuProps> = ({
@@ -19,7 +20,8 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   position,
   tableEditable,
   tableRef,
-  dropDownDelay
+  dropDownDelay,
+  gridConfigVals
 }) => {
   const [adjustedPosition, setAdjustedPosition] = useState<{
     top: number;
@@ -87,7 +89,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
       setLoading(true);
       const timer = setTimeout(() => setVisible(true), dropDownDelay);
 
-      // Update ref
+      // Update ref 
       prevActiveDropdown.current = { row: activeDropdown.row, col: activeDropdown.col };
 
       return () => clearTimeout(timer);
@@ -97,7 +99,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
       setLoading(false);
     }
 
-  }, [activeDropdown, activeDropdown.filteredOptions.length, tableRef, position]);
+  }, [activeDropdown, activeDropdown.filteredOptions.length, gridConfigVals, gridConfigVals.length, tableRef, position]);
 
   // Auto-close on scroll/resize
   useEffect(() => {
@@ -161,8 +163,8 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      {activeDropdown.filteredOptions.length > 0 ? (
-        activeDropdown.filteredOptions.map((option, idx) => (
+      {gridConfigVals && gridConfigVals.length > 0 ? (
+        gridConfigVals.map((option, idx) => (
           <div
             key={idx}
             className="dropdown-option"

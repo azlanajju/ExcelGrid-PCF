@@ -58,7 +58,7 @@ const constants = {
   },
 };
 
-export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+export class DPSGridV25 implements ComponentFramework.StandardControl<IInputs, IOutputs> {
   private container: HTMLDivElement;
   private root: Root;
   private notifyOutputChanged: () => void;

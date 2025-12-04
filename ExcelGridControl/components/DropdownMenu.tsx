@@ -34,13 +34,13 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const prevActiveDropdown = React.useRef<{ row: number; col: number } | null>(null);
-
 
   useEffect(() => {
     if (!tableRef.current || !activeDropdown || position.top == 0 || position.left == 0) return;
 
     // console.log("position",position);
+
+    setVisible(false);
 
     const dropdownHeight =
       activeDropdown.filteredOptions.length === 0
@@ -79,27 +79,15 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
       maxHeight,
     });
 
-    // Only reset visibility/loading if the cell position changed
-    if (
-      !prevActiveDropdown.current ||
-      prevActiveDropdown.current.row !== activeDropdown.row ||
-      prevActiveDropdown.current.col !== activeDropdown.col
-    ) {
-      setVisible(false);
-      setLoading(true);
-      const timer = setTimeout(() => setVisible(true), dropDownDelay);
+    // Make it appear smoothly after layout calc
+    // requestAnimationFrame(() => setVisible(true));
 
-      // Update ref 
-      prevActiveDropdown.current = { row: activeDropdown.row, col: activeDropdown.col };
+    setLoading(true)
 
-      return () => clearTimeout(timer);
-    } else {
-      // If position is same (just options updated), ensure visible and not loading
-      setVisible(true);
-      setLoading(false);
-    }
+    const timer = setTimeout(() => setVisible(true), dropDownDelay);
+    return () => clearTimeout(timer);
 
-  }, [activeDropdown, activeDropdown.filteredOptions.length, gridConfigVals, tableRef, position]);
+  }, [activeDropdown, activeDropdown.filteredOptions.length, gridConfigVals, gridConfigVals.length, tableRef, position]);
 
   // Auto-close on scroll/resize
   useEffect(() => {
@@ -163,7 +151,17 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
       }}
       onClick={(e) => e.stopPropagation()}
     >
-      {gridConfigVals && gridConfigVals.length > 0 ? (
+      {activeDropdown.filteredOptions.length > 0 ? (
+        activeDropdown.filteredOptions.map((option, idx) => (
+          <div
+            key={idx}
+            className="dropdown-option"
+            onClick={() => onSelectOption(option)}
+          >
+            {option}
+          </div>
+        ))
+      ) : gridConfigVals.length > 0 ? (
         gridConfigVals.map((option, idx) => (
           <div
             key={idx}
