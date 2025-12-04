@@ -32,13 +32,13 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
   const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const prevActiveDropdown = React.useRef<{ row: number; col: number } | null>(null);
+
 
   useEffect(() => {
     if (!tableRef.current || !activeDropdown || position.top == 0 || position.left == 0) return;
 
     // console.log("position",position);
-
-    setVisible(false);
 
     const dropdownHeight =
       activeDropdown.filteredOptions.length === 0
@@ -77,13 +77,25 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
       maxHeight,
     });
 
-    // Make it appear smoothly after layout calc
-    // requestAnimationFrame(() => setVisible(true));
+    // Only reset visibility/loading if the cell position changed
+    if (
+      !prevActiveDropdown.current ||
+      prevActiveDropdown.current.row !== activeDropdown.row ||
+      prevActiveDropdown.current.col !== activeDropdown.col
+    ) {
+      setVisible(false);
+      setLoading(true);
+      const timer = setTimeout(() => setVisible(true), dropDownDelay);
 
-    setLoading(true)
+      // Update ref
+      prevActiveDropdown.current = { row: activeDropdown.row, col: activeDropdown.col };
 
-    const timer = setTimeout(() => setVisible(true), dropDownDelay);
-    return () => clearTimeout(timer);
+      return () => clearTimeout(timer);
+    } else {
+      // If position is same (just options updated), ensure visible and not loading
+      setVisible(true);
+      setLoading(false);
+    }
 
   }, [activeDropdown, activeDropdown.filteredOptions.length, tableRef, position]);
 
