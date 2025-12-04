@@ -23,11 +23,12 @@ import { getFormula, hasFormula, hasUpload } from "./utils/formulas";
 import { isValidDropdownValue } from "./utils/validation";
 
 export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
-  const { data, setData, rowIds, dataWithTotals, configData, columnsWithTotals, setColumnsWithTotals } = useExcelData(props);
-useEffect(() => {
-  console.log("props.resetConfig",props.resetConfig);
-  
-},[props.resetConfig])
+  const [uploadingFileState,setUploadingFileState] =useState<string>("");
+
+  const { data, setData, rowIds, dataWithTotals, configData, columnsWithTotals, setColumnsWithTotals } = useExcelData(uploadingFileState,{...props});
+
+
+
   const { selection, focusedCell, setSelection, setFocusedCell, startSelection, extendSelection, endSelection, getSelectedRange } = useSelection();
 
  const [visible, setVisible] = useState(false); 
@@ -334,7 +335,7 @@ useEffect(() => {
           <h3 className="excel-title">{props.title}</h3>
 
         </div>
-        <Toolbar uploadChange={props.uploadChange} uploadDelay={props.uploadDelay} tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton}
+        <Toolbar uploadChange={(val:string) => { setUploadingFileState(val);props.uploadChange(val)}} uploadDelay={props.uploadDelay} tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton}
           // addRow={() => setData((prev) => [...prev, new Array(prev[0].length).fill("")])} 
           showDownloadButton={props.showDownloadButton} showUploadButton={props.showUploadButton}
           addRow={() => setData(function (prev) {

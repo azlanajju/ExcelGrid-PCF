@@ -394,6 +394,7 @@ export class DPSGridV2 implements ComponentFramework.StandardControl<IInputs, IO
           this.uploadingFile = val;
           this.notifyOutputChanged();
         },
+        uploadingFile: this.uploadingFile,
 
         // onDataChange: (data: string[][], frozenColumns = "", fileSetCells = "") => {
         //   this.sampleGrid = JSON.stringify(data);

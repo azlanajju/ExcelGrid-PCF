@@ -158,7 +158,6 @@ export const GridCell: React.FC<GridCellProps> = ({ value, row, id, col, selecte
     if (selected) inputRef.current?.focus();
   }, [selected]);
 
-  if (isHighlighted) console.log("Header true", headerVal, isHighlighted);
 
 
   // ---- Renderer helpers ----
@@ -231,7 +230,6 @@ const renderNormalInput = () => {
           width: "100%",
           height: "100%",
           border: "none",
-          background: "transparent",
           textAlign: "right",
           appearance: "none",
           MozAppearance: "textfield",
@@ -264,7 +262,6 @@ const renderNormalInput = () => {
         left: "0px",
         textAlign: "left",
         border: "none",
-        background: "transparent",
       }}
     />
   );
@@ -325,7 +322,7 @@ const renderNormalInput = () => {
   return (
     <td
       className={`excel-cell ${frozen ? "frozen" : ""} ${selected && !isUsing ? "selected" : ""} ${focused ? "focused" : ""} ${hasDropdown ? "dropdown-cell" : ""} ${isFormula ? "formula-cell" : ""} ${!isEditable ? "readonly-cell" : ""} ${isTotalRow ? "total-cell" : ""}`}
-      style={{ ...cellStyle, height: "28px" }}
+      style={{ ...cellStyle, height: "28px",background:"transparent" }}
       onMouseDown={(e) => {
         if ((e.target as HTMLElement).closest(".dropdown-menu")) return;
         setIsUsing(true);

@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Cell, ExcelGridProps } from "../types";
 import { updateFormulas } from "../utils";
 import { jsonTo2DArray, twoDArrayToJson } from "../utils/converters";
 
-export const useExcelData = (props: ExcelGridProps) => {
+export const useExcelData = (uploadingFileState:string,props: ExcelGridProps) => {
   const [data, setData] = useState<Cell[][]>([
     ["Header1", "Header2", "Header3"],
     ["", "", ""],
@@ -16,28 +16,43 @@ export const useExcelData = (props: ExcelGridProps) => {
   const [rowIds, setRowIds] = useState<Record<number, string>>({});
   const [columnOrderMap, setColumnOrderMap] = useState<number[] | null>(null);
 
-  useEffect(() => {
+  const firstRun = useRef(true);
+
+useEffect(() => {
+  if (firstRun.current) {
+    firstRun.current = false;
+    return;
+  }
+
+  // your logic here ⬇⬇
+  if(uploadingFileState !== "") {
+    console.log("Data changed", uploadingFileState);
+    setPrevData(data);
+    return;
+  }
+
+  console.log("Data changed out uploadingFile:", uploadingFileState);
+
   if (!props.resetConfig || !prevData.length) {
     setPrevData(data);
     return;
   }
 
-  const resetRules = props.resetConfig; // example: { "1": ["2"] }
+  const resetRules : any = props.resetConfig;
   let updated = false;
 
   const newData = data.map((row, rowIndex) => {
-    if (rowIndex === 0) return row; // skip headers
+    if (rowIndex === 0) return row;
 
     let updatedRow = [...row];
 
-    Object.entries(resetRules).forEach(([sourceCol, dependentCols]:any) => {
+    Object.entries(resetRules).forEach(([sourceCol, dependentCols] : any) => {
       const sc = Number(sourceCol);
       const deps = dependentCols.map(Number);
 
       const prevValue = prevData[rowIndex]?.[sc];
       const currentValue = row[sc];
 
-      // Trigger only if value changed
       if (prevValue !== currentValue) {
         deps.forEach((colIdx) => {
           if (updatedRow[colIdx] !== "") {
@@ -56,7 +71,9 @@ export const useExcelData = (props: ExcelGridProps) => {
   }
 
   setPrevData(data);
-}, [data, props.resetConfig]);
+
+}, [data,props.resetConfig]);
+
 
 
 

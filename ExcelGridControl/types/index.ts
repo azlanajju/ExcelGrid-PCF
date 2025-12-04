@@ -23,6 +23,7 @@ export interface ConversionConfig {
 export interface ExcelGridProps {
   title: string;
   height: string;
+  uploadingFile: string;
   onDataChange: (data: Cell[][], frozenColumns?: string) => void;
   onColumnOrderChange: (columnOrder: string) => void;
   onFileUpdload: (row: string, col: string) => void;
