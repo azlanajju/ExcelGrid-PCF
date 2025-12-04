@@ -983,7 +983,7 @@
 
 .excel-input {
   /* background-color: #dbeafe; */
-  padding: 5px 10px;
+  padding: 5px 10px !important;
   text-align: left !important;
   /* height: 44px !important; */
 }
@@ -1011,7 +1011,7 @@
 .dropdown-arrow {
   /* top: 14px; */
   transform: none;
-  top: 10px;
+  top: 10px !important;
   background: white;
 }
 
