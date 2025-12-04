@@ -230,7 +230,8 @@
 .excel-input {
   width: 100%;
   height: 100%;
-  border: none;
+  /* border: none; */
+  border: 1px solid #ccc !important;
   padding: 0 12px;
   box-sizing: border-box;
   outline: none;
@@ -302,6 +303,7 @@
 
   padding: 0px !important;
   border: none !important;
+  /* border: 1px solid #ccc !important; */
 }
 
 .excel-input.header-input::placeholder {
@@ -313,7 +315,7 @@
   background: rgb(203 213 225) !important;
   color: #020617;
 
-  border: none !important;
+  /* border: none !important; */
 
   /* border-left: 1px solid gray; */
   box-shadow: inset 0 0 0 1px #e4eaf0;
@@ -1053,4 +1055,15 @@
 
 .excel-input.header-input.frozen {
   box-shadow: none;
+}
+
+.excel-input.header-input {
+  border: none !important;
+}
+
+input.excel-input {
+  margin-top: -6px;
+  margin-top: -4px;
+  height: 32px !important;
+  text-align: right !important;
 }

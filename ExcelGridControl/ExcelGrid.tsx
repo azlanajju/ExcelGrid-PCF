@@ -443,7 +443,7 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
           multiLineCols={props.multiLineCols} numberCols={props.numberCols} cellHighlight={props.cellHighlight}
           cellsDisabled={props.cellsDisabled} checkDropDown={checkDropDown} {...props} />
 
-        {activeDropdown && <DropdownMenu dropDownDelay={props.dropDownDelay} activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection} />}
+        {activeDropdown && <DropdownMenu gridConfigVals={props.gridConfigVals} dropDownDelay={props.dropDownDelay} activeDropdown={activeDropdown} onSelectOption={selectDropdownOption} position={getDropdownPosition(activeDropdown.row, activeDropdown.col)} tableEditable={props.tableEditable} tableRef={tableRef} setActiveDropdown={setActiveDropdown} endSelection={endSelection} />}
       </div>
 
       {

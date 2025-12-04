@@ -141,6 +141,8 @@ const GridCellComponent: React.FC<GridCellProps> = ({
       return (
         <input
           type="number"
+          className={`${commonInputProps.className} ${isMultiLineInput ? '' : 'excel-input-fixed-height'} ${hasDropdown ? "dropdown-input" : ""} ${isFormula ? "formula-input" : ""}`}
+
           {...commonInputProps}
           style={{
             ...cellStyle,
@@ -148,7 +150,7 @@ const GridCellComponent: React.FC<GridCellProps> = ({
             width: "100%", height: "100%", border: "none",
             //  background: "transparent",
             textAlign: "right", appearance: "none", MozAppearance: "textfield",
-            padding: "6px 20px 10px 12px"
+            // padding: "6px 20px 10px 12px"
           }}
         />
       );
