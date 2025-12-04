@@ -23,7 +23,9 @@ import { getFormula, hasFormula, hasUpload } from "./utils/formulas";
 // import { isValidDropdownValue } from "./utils/validation";
 
 export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
-  const { data, setData, rowIds, dataWithTotals, configData, columnsWithTotals, setColumnsWithTotals } = useExcelData(props);
+  const [uploadingFileState, setUploadingFileState] = useState<string>("");
+
+  const { data, setData, rowIds, dataWithTotals, configData, columnsWithTotals, setColumnsWithTotals } = useExcelData(uploadingFileState, { ...props });
 
   const { selection, focusedCell, setSelection, setFocusedCell, startSelection, extendSelection, endSelection, getSelectedRange } = useSelection();
 
@@ -166,14 +168,14 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
     [props.tableEditable, props.headerEditable, props.formulaConfig, props.readOnlyColumns, data]
   );
 
-  const handleUploadStatus = (status: string) => {
-    props.uploadChange(status);
-    if (status === "Uploading") {
-      setTimeout(() => {
-        props.uploadChange("");
-      }, props.uploadDelay || 1000);
-    }
-  };
+  // const handleUploadStatus = (status: string) => {
+  //   props.uploadChange(status);
+  //   if (status === "Uploading") {
+  //     setTimeout(() => {
+  //       props.uploadChange("");
+  //     }, props.uploadDelay || 1000);
+  //   }
+  // };
 
   const { handleKeyDown } = useKeyboard({
     data,
@@ -190,7 +192,7 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
     setToast: setToast,
     noValidaton: props.noValidaton,
     ignoreValidationColumn: props.ignoreValidationColumn,
-    handleUploadStatus: handleUploadStatus
+    uploadChange: props.uploadChange
   });
 
   useClipboard();
@@ -368,7 +370,7 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
 
         </div>
 
-        <Toolbar uploadChange={handleUploadStatus} tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton}
+        <Toolbar uploadChange={(val: string) => { setUploadingFileState(val); props.uploadChange(val) }} uploadDelay={props.uploadDelay} tableEditable={props.tableEditable} showAddRowButton={props.showAddRowButton} showAddColumnButton={props.showAddColumnButton}
           // addRow={() => setData((prev) => [...prev, new Array(prev[0].length).fill("")])} 
           showDownloadButton={props.showDownloadButton} showUploadButton={props.showUploadButton}
           addRow={() => setData(function (prev) {

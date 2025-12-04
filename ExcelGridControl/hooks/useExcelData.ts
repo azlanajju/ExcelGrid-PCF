@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Cell, ExcelGridProps } from "../types";
 import { updateFormulas } from "../utils";
 import { jsonTo2DArray, twoDArrayToJson } from "../utils/converters";
 
-export const useExcelData = (props: ExcelGridProps) => {
+export const useExcelData = (uploadingFileState: string, props: ExcelGridProps) => {
   const [data, setData] = useState<Cell[][]>([
     ["Header1", "Header2", "Header3"],
     ["", "", ""],
@@ -16,47 +16,62 @@ export const useExcelData = (props: ExcelGridProps) => {
   const [rowIds, setRowIds] = useState<Record<number, string>>({});
   const [columnOrderMap, setColumnOrderMap] = useState<number[] | null>(null);
 
+  const firstRun = useRef(true);
+
+
   useEffect(() => {
-  if (!props.resetConfig || !prevData.length) {
-    setPrevData(data);
-    return;
-  }
+    if (firstRun.current) {
+      firstRun.current = false;
+      return;
+    }
 
-  const resetRules = props.resetConfig; // example: { "1": ["2"] }
-  let updated = false;
+    // your logic here ⬇⬇
+    if (uploadingFileState !== "") {
+      console.log("Data changed", uploadingFileState);
+      setPrevData(data);
+      return;
+    }
 
-  const newData = data.map((row, rowIndex) => {
-    if (rowIndex === 0) return row; // skip headers
+    if (!props.resetConfig || !prevData.length) {
+      setPrevData(data);
+      return;
+    }
 
-    let updatedRow = [...row];
+    const resetRules = props.resetConfig; // example: { "1": ["2"] }
+    let updated = false;
 
-    Object.entries(resetRules).forEach(([sourceCol, dependentCols]:any) => {
-      const sc = Number(sourceCol);
-      const deps = dependentCols.map(Number);
+    const newData = data.map((row, rowIndex) => {
+      if (rowIndex === 0) return row; // skip headers
 
-      const prevValue = prevData[rowIndex]?.[sc];
-      const currentValue = row[sc];
+      let updatedRow = [...row];
 
-      // Trigger only if value changed
-      if (prevValue !== currentValue) {
-        deps.forEach((colIdx) => {
-          if (updatedRow[colIdx] !== "") {
-            updatedRow[colIdx] = "";
-            updated = true;
-          }
-        });
-      }
+      Object.entries(resetRules).forEach(([sourceCol, dependentCols]: any) => {
+        const sc = Number(sourceCol);
+        const deps = dependentCols.map(Number);
+
+        const prevValue = prevData[rowIndex]?.[sc];
+        const currentValue = row[sc];
+
+        // Trigger only if value changed
+        if (prevValue !== currentValue) {
+          deps.forEach((colIdx) => {
+            if (updatedRow[colIdx] !== "") {
+              updatedRow[colIdx] = "";
+              updated = true;
+            }
+          });
+        }
+      });
+
+      return updatedRow;
     });
 
-    return updatedRow;
-  });
+    if (updated) {
+      setData(newData);
+    }
 
-  if (updated) {
-    setData(newData);
-  }
-
-  setPrevData(data);
-}, [data, props.resetConfig]);
+    setPrevData(data);
+  }, [data, props.resetConfig]);
 
 
 
@@ -151,7 +166,7 @@ export const useExcelData = (props: ExcelGridProps) => {
             // 🔹 Find index of "id" column (case-insensitive)
             const headers = parsedWithoutTotals[0];
             const idIndex = headers.findIndex((h) => String(h).toLowerCase() === "ID".toLocaleLowerCase());
-            
+
             // 🔹 Find index of "RowUniqueID" column (case-insensitive) - should be hidden
             const rowUniqueIdIndex = headers.findIndex((h) => String(h).trim().toLowerCase() === "rowuniqueid".toLowerCase());
 

@@ -16,10 +16,10 @@ interface UseKeyboardProps {
   setToast: React.Dispatch<React.SetStateAction<string>>;
   ignoreValidationColumn?: string[];
   noValidaton: boolean;
-  handleUploadStatus: (status: string) => void
+  uploadChange: (status: string) => void
 }
 
-export const useKeyboard = ({ data, setData, handleUploadStatus, selection, focusedCell, setFocusedCell, setSelection, isCellEditable, hasFormula, hasDropdownOptions, updateFormulas, getDropdownOptions, setToast, ignoreValidationColumn, noValidaton }: UseKeyboardProps) => {
+export const useKeyboard = ({ data, setData, uploadChange, selection, focusedCell, setFocusedCell, setSelection, isCellEditable, hasFormula, hasDropdownOptions, updateFormulas, getDropdownOptions, setToast, ignoreValidationColumn, noValidaton }: UseKeyboardProps) => {
   const { clipboard, copyFromSystemClipboard, copySelection, cutSelection, pasteData } = useClipboard();
 
   const getSelectedRange = () => {
@@ -182,10 +182,13 @@ export const useKeyboard = ({ data, setData, handleUploadStatus, selection, focu
       const clipboardData = systemClipboard || clipboard;
 
       if (clipboardData) {
-        handleUploadStatus("Uploading");
+        uploadChange("Uploading");
         const [sr, sc] = selection.start;
         const newData = pasteData(data, clipboardData, sr, sc, isCellEditable, hasDropdownOptions, hasFormula, getDropdownOptions);
         setData(updateFormulas(newData));
+        setTimeout(() => {
+          uploadChange("");
+        }, 2000);
       }
     }
 
