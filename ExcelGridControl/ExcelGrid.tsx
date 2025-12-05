@@ -56,7 +56,7 @@ export const ExcelGrid: React.FC<ExcelGridProps> = (props) => {
 
 
   useEffect(() => {
-    console.log("Version:", 1.7);
+    console.log("Version:", 34);
   }, []);
 
   useEffect(() => {

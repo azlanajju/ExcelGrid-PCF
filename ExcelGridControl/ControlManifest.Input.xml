@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="com.novigo.com" constructor="DPSGridV2" version="0.0.3" display-name-key="DPSGridV2Control" description-key="DPSGridV2Control description" control-type="standard">
+  <control namespace="com.novigo.com" constructor="DPSGridV34" version="0.0.3" display-name-key="DPSGridV34Control" description-key="DPSGridV34Control stable" control-type="standard">
     <external-service-usage enabled="false" />
 
     <!-- Existing properties -->
